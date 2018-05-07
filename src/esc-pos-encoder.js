@@ -238,7 +238,7 @@ class EscPosEncoder {
         if (value === 'small') {
             value = 0x01;
         } else {
-            value = 0x01;
+            value = 0x0;
         }
 
         this._queue([
