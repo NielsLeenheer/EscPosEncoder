@@ -138,6 +138,27 @@ It will try to remember the current state of the text style. But you can also pr
         .bold(false)
         .encode()
 
+### Italic
+
+Change the text style to italic. 
+
+    let result = encoder
+        .text('This is ')
+        .italic()
+        .text('italic')
+        .italic()
+        .encode()
+
+It will try to remember the current state of the text style. But you can also provide and additional parameter to force the text style to turn on and off.
+
+    let result = encoder
+        .text('This is ')
+        .italic(true)
+        .text('italic')
+        .italic(false)
+        .encode()
+
+Note: this text style is not supported by most receipt printers. 
 ### Size
 
 Change the text size. You can specify the size using a parameter which can be either "small" or "normal".
