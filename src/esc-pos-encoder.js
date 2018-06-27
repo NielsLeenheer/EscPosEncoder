@@ -28,6 +28,7 @@ class EscPosEncoder {
         this._state = {
             'bold': false,
             'underline': false,
+            'hanzi': false,
         };
     }
 
@@ -75,33 +76,37 @@ class EscPosEncoder {
      */
     codepage(value) {
         const codepages = {
-            'cp437': 0x00,
-            'cp737': 0x40,
-            'cp850': 0x02,
-            'cp775': 0x5f,
-            'cp852': 0x12,
-            'cp855': 0x3c,
-            'cp857': 0x3d,
-            'cp858': 0x13,
-            'cp860': 0x03,
-            'cp861': 0x38,
-            'cp862': 0x3e,
-            'cp863': 0x04,
-            'cp864': 0x1c,
-            'cp865': 0x05,
-            'cp866': 0x11,
-            'cp869': 0x42,
-            'cp1252': 0x10,
-            'iso88596': 0x16,
-            'windows1250': 0x48,
-            'windows1251': 0x49,
-            'windows1252': 0x47,
-            'windows1253': 0x5a,
-            'windows1254': 0x5b,
-            'windows1255': 0x20,
-            'windows1256': 0x5c,
-            'windows1257': 0x19,
-            'windows1258': 0x5e,
+            'cp437': [0x00, false],
+            'cp737': [0x40, false],
+            'cp850': [0x02, false],
+            'cp775': [0x5f, false],
+            'cp852': [0x12, false],
+            'cp855': [0x3c, false],
+            'cp857': [0x3d, false],
+            'cp858': [0x13, false],
+            'cp860': [0x03, false],
+            'cp861': [0x38, false],
+            'cp862': [0x3e, false],
+            'cp863': [0x04, false],
+            'cp864': [0x1c, false],
+            'cp865': [0x05, false],
+            'cp866': [0x11, false],
+            'cp869': [0x42, false],
+            'cp936': [0xff, true],
+            'cp949': [0xfd, true],
+            'cp950': [0xfe, true],
+            'cp1252': [0x10, false],
+            'iso88596': [0x16, false],
+            'shiftjis': [0xfc, true],
+            'windows1250': [0x48, false],
+            'windows1251': [0x49, false],
+            'windows1252': [0x47, false],
+            'windows1253': [0x5a, false],
+            'windows1254': [0x5b, false],
+            'windows1255': [0x20, false],
+            'windows1256': [0x5c, false],
+            'windows1257': [0x19, false],
+            'windows1258': [0x5e, false],
         };
 
         let codepage;
@@ -122,9 +127,10 @@ class EscPosEncoder {
 
         if (typeof codepages[codepage] !== 'undefined') {
             this._codepage = codepage;
+            this._state.hanzi = codepages[codepage][1];
 
             this._queue([
-                0x1b, 0x74, codepages[codepage],
+                0x1b, 0x74, codepages[codepage][0],
             ]);
         } else {
             throw new Error('Codepage not supported by printer');
@@ -149,9 +155,15 @@ class EscPosEncoder {
 
         let bytes = this._encode(value);
 
-        this._queue([
-            bytes,
-        ]);
+        if (this._state.hanzi) {
+            this._queue([
+                0x1c, 0x26, bytes, 0x1c, 0x2e,
+            ]);
+        } else {
+            this._queue([
+                bytes,
+            ]);
+        }
 
         return this;
     }

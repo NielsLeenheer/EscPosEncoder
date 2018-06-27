@@ -46,9 +46,11 @@ If you don't specify a code page, it will assume you want to print only ASCII ch
     let result = encoder
         .codepage('windows1251')
         .text('Iñtërnâtiônàlizætiøn')
+        .codepage('cp936')
+        .text('简体中文')
         .encode()
 
-The following code pages are supported: cp437, cp737, cp850, cp775, cp852, cp855, cp857, cp858, cp860, cp861, cp862, cp863, cp864, cp865, cp866, cp869, cp1252, iso88596, windows1250, windows1251, windows1252, windows1253, windows1254, windows1255, windows1256, windows1257, windows1258.
+The following code pages are supported: cp437, cp737, cp850, cp775, cp852, cp855, cp857, cp858, cp860, cp861, cp862, cp863, cp864, cp865, cp866, cp869, cp936, cp949, cp950, cp1252, iso88596, shiftjis, windows1250, windows1251, windows1252, windows1253, windows1254, windows1255, windows1256, windows1257, windows1258.
 
 ### Text
 

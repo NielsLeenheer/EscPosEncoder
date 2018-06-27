@@ -50,6 +50,14 @@ describe('EscPosEncoder', function() {
         });
     });
 
+    describe('codepage(cp936).text(简体中文) - simplified chinese', function () {
+        let result = encoder.codepage('cp936').text('简体中文').encode();
+        
+        it('should be [ 27, 116, 255, 28, 38, 188, 242, 204, 229, 214, 208, 206, 196, 28, 46 ]', function () {
+            assert.deepEqual(new Uint8Array([ 27, 116, 255, 28, 38, 188, 242, 204, 229, 214, 208, 206, 196, 28, 46 ]), result);
+        });
+    });
+
     describe('codepage(win1252).text(héllo) - é -> 233', function () {
         let result = encoder.codepage('win1252').text('héllo').encode();
         
