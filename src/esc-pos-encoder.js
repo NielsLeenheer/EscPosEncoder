@@ -27,6 +27,7 @@ class EscPosEncoder {
 
         this._state = {
             'bold': false,
+            'italic': false,
             'underline': false,
             'hanzi': false,
         };
@@ -213,6 +214,27 @@ class EscPosEncoder {
 
         this._queue([
             0x1b, 0x2d, Number(value),
+        ]);
+
+        return this;
+    }
+
+    /**
+     * Italic text
+     *
+     * @param  {boolean}          value  true to turn on italic, false to turn off
+     * @return {object}                  Return the object, for easy chaining commands
+     *
+     */
+    italic(value) {
+        if (typeof value === 'undefined') {
+            value = ! this._state.italic;
+        }
+
+        this._state.italic = value;
+
+        this._queue([
+            0x1b, 0x34, Number(value),
         ]);
 
         return this;

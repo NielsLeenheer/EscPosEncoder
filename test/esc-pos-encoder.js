@@ -98,6 +98,14 @@ describe('EscPosEncoder', function() {
         });
     });
 
+    describe('italic().text(hello).italic()', function () {
+        let result = encoder.italic().text('hello').italic().encode();
+        
+        it('should be [ 27, 69, 1, ..., 27, 69, 0 ]', function () {
+            assert.deepEqual(new Uint8Array([ 27, 52, 1, 104, 101, 108, 108, 111, 27, 52, 0 ]), result);
+        });
+    });
+
     describe('underline(true).text(hello).underline(false)', function () {
         let result = encoder.underline(true).text('hello').underline(false).encode();
         
