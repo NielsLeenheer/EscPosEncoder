@@ -227,6 +227,16 @@ The fifth paramter is the threshold that will be used by the threshold and bayer
             .encode()
     }
 
+### Cut
+
+Cut the paper. Optionally a parameter can be specified which can be either be "partial" or "full". If not specified, a full cut will be used. 
+
+    let result = encoder
+        .cut('partial')
+        .encode()
+
+Note: Not all printer models support cutting paper. And even if they do, they might not support both types of cuts.
+
 ## License
 
 MIT

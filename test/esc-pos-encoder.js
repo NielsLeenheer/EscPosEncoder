@@ -174,4 +174,28 @@ describe('EscPosEncoder', function() {
             assert.deepEqual(new Uint8Array([ 29, 118, 48, 0, 1, 0, 8, 0, 127, 255, 255, 255, 255, 255, 255, 255 ]), result);
         });
     });
+
+    describe('cut()', function () {
+        let result = encoder.cut().encode();
+        
+        it('should be [ 27, 86, 00 ]', function () {
+            assert.deepEqual(new Uint8Array([ 27, 86, 00 ]), result);
+        });
+    });
+
+    describe('cut(full)', function () {
+        let result = encoder.cut('full').encode();
+        
+        it('should be [ 27, 86, 00 ]', function () {
+            assert.deepEqual(new Uint8Array([ 27, 86, 00 ]), result);
+        });
+    });
+
+    describe('cut(partial)', function () {
+        let result = encoder.cut('partial').encode();
+        
+        it('should be [ 27, 86, 01 ]', function () {
+            assert.deepEqual(new Uint8Array([ 27, 86, 01 ]), result);
+        });
+    });
 });

@@ -446,6 +446,27 @@ class EscPosEncoder {
     }
 
     /**
+     * Cut paper
+     *
+     * @param  {string}          value   full or partial. When not specified a full cut will be assumed
+     * @return {object}                  Return the object, for easy chaining commands
+     *
+     */
+    cut(value) {
+        let data = 0x00;
+
+        if (value == 'partial') {
+            data = 0x01;
+        }
+
+        this._queue([
+            0x1b, 0x56, data,
+        ]);
+
+        return this;
+    }
+
+    /**
      * Encode all previous commands
      *
      * @return {Uint8Array}         Return the encoded bytes
