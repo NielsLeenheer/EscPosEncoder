@@ -282,6 +282,31 @@ class EscPosEncoder {
         return this;
     }
 
+   /**
+     * Change text alignment
+     *
+     * @param  {string}          value   left, center or right
+     * @return {object}                  Return the object, for easy chaining commands
+     *
+     */
+    align(value) {
+        const alignments = {
+            'left': 0x00,
+            'center': 0x01,
+            'right': 0x02,
+        };
+
+        if (value in alignments) {
+            this._queue([
+                0x1b, 0x61, alignments[value],
+            ]);
+        } else {
+            throw new Error('Unknown alignment');
+        }
+
+        return this;
+    }
+
     /**
      * Barcode
      *

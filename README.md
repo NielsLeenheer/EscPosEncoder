@@ -159,6 +159,20 @@ It will try to remember the current state of the text style. But you can also pr
         .encode()
 
 Note: this text style is not supported by most receipt printers. 
+
+### Align
+
+Change the alignment of the text. You can specify the alignment using a parameter which can be either "left", "center" or "right".
+
+    let result = encoder
+        .align('right')
+        .line('This line is aligned to the right')
+        .align('center')
+        .line('This line is centered')
+        .align('left')
+        .line('This line is aligned to the left')
+        .encode()
+
 ### Size
 
 Change the text size. You can specify the size using a parameter which can be either "small" or "normal".

@@ -122,6 +122,30 @@ describe('EscPosEncoder', function() {
         });
     });
 
+    describe('align(left).line(hello)', function () {
+        let result = encoder.align('left').line('hello').encode();
+        
+        it('should be [ 27, 97, 0, ..., 10, 13 ]', function () {
+            assert.deepEqual(new Uint8Array([ 27, 97, 0, 104, 101, 108, 108, 111, 10, 13 ]), result);
+        });
+    });
+
+    describe('align(center).line(hello)', function () {
+        let result = encoder.align('center').line('hello').encode();
+        
+        it('should be [ 27, 97, 1, ..., 10, 13 ]', function () {
+            assert.deepEqual(new Uint8Array([ 27, 97, 1, 104, 101, 108, 108, 111, 10, 13 ]), result);
+        });
+    });
+
+    describe('align(right).line(hello)', function () {
+        let result = encoder.align('right').line('hello').encode();
+        
+        it('should be [ 27, 97, 2, ..., 10, 13 ]', function () {
+            assert.deepEqual(new Uint8Array([ 27, 97, 2, 104, 101, 108, 108, 111, 10, 13 ]), result);
+        });
+    });
+
     describe('qrcode(https://nielsleenheer.com)', function () {
         let result = encoder.qrcode('https://nielsleenheer.com').encode();
         
