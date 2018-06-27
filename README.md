@@ -125,7 +125,7 @@ Change the text style to bold.
     let result = encoder
         .text('This is ')
         .bold()
-        .text('underlined')
+        .text('bold')
         .bold()
         .encode()
 
