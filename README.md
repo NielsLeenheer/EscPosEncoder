@@ -237,6 +237,15 @@ Cut the paper. Optionally a parameter can be specified which can be either be "p
 
 Note: Not all printer models support cutting paper. And even if they do, they might not support both types of cuts.
 
+### Raw
+
+Add raw printer commands, in case you want to send a command that this library does not support natively. For example the following command is to turn of Hanzi character mode.
+
+    let result = encoder
+        .raw([ 0x1c, 0x2e ])
+        .encode()
+        
+
 ## License
 
 MIT

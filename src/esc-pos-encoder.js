@@ -467,6 +467,19 @@ class EscPosEncoder {
     }
 
     /**
+     * Add raw printer commands
+     *
+     * @param  {array}           data   raw bytes to be included
+     * @return {object}          Return the object, for easy chaining commands
+     *
+     */
+    raw(data) {
+        this._queue(data);
+
+        return this;
+    }
+
+    /**
      * Encode all previous commands
      *
      * @return {Uint8Array}         Return the encoded bytes

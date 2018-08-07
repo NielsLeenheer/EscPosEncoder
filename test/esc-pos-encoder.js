@@ -198,4 +198,12 @@ describe('EscPosEncoder', function() {
             assert.deepEqual(new Uint8Array([ 27, 86, 01 ]), result);
         });
     });
+
+    describe('raw([ 0x1c, 0x2e ])', function () {
+        let result = encoder.raw([ 0x1c, 0x2e ]).encode();
+        
+        it('should be [ 28, 46 ]', function () {
+            assert.deepEqual(new Uint8Array([ 28, 46 ]), result);
+        });
+    });
 });
