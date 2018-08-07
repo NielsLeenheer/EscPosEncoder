@@ -348,26 +348,89 @@ class EscPosEncoder {
      * QR code
      *
      * @param  {string}           value  the value of the qr code
+     * @param  {number}           model  model of the qrcode, either 1 or 2
+     * @param  {number}           size   size of the qrcode, a value between 1 and 8
+     * @param  {string}           errorlevel  the amount of error correction used, either 'l', 'm', 'q', 'h'
      * @return {object}                  Return the object, for easy chaining commands
      *
      */
-    qrcode(value) {
+    qrcode(value, model, size, errorlevel) {
+        /* Force printing the print buffer and moving to a new line */
+
+        this._queue([
+            0x0a,
+        ]);
+
+        /* Model */
+
+        const models = {
+            1: 0x31,
+            2: 0x32,
+        };
+
+        if (typeof model === 'undefined') {
+            model = 2;
+        }
+
+        if (model in models) {
+            this._queue([
+                0x1d, 0x28, 0x6b, 0x04, 0x00, 0x31, 0x41, models[model], 0x00,
+            ]);
+        } else {
+            throw new Error('Model must be 1 or 2');
+        }
+
+        /* Size */
+
+        if (typeof size === 'undefined') {
+            size = 6;
+        }
+
+        if (typeof size !== 'number') {
+            throw new Error('Size must be a number');
+        }
+
+        if (size < 1 || size > 8) {
+            throw new Error('Size must be between 1 and 8');
+        }
+
+        this._queue([
+            0x1d, 0x28, 0x6b, 0x03, 0x00, 0x31, 0x43, size,
+        ]);
+
+        /* Error level */
+
+        const errorlevels = {
+            'l': 0x30,
+            'm': 0x31,
+            'q': 0x32,
+            'h': 0x33,
+        };
+
+        if (typeof errorlevel === 'undefined') {
+            errorlevel = 'm';
+        }
+
+        if (errorlevel in errorlevels) {
+            this._queue([
+                0x1d, 0x28, 0x6b, 0x03, 0x00, 0x31, 0x45, errorlevels[errorlevel],
+            ]);
+        } else {
+            throw new Error('Error level must be l, m, q or h');
+        }
+
+        /* Data */
+
         let bytes = iconv.encode(value, 'iso88591');
-
-        // 0x1d, 0x21, [ 0x00, 0x11, 0x22, 0x33 ]
-
-        // 0x1b, 0x4a, 0x28
-
         let length = bytes.length + 3;
 
         this._queue([
-            0x1d, 0x28, 0x6b, 0x04, 0x00, 0x31, 0x41, 0x32, 0x00,
-            0x1d, 0x28, 0x6b, 0x03, 0x00, 0x31, 0x43, 0x06,
-            0x1d, 0x28, 0x6b, 0x03, 0x00, 0x31, 0x45, 0x31,
-            0x1d, 0x28, 0x6b,
-                length % 0xff, length / 0xff,
-                0x31, 0x50, 0x30,
-                bytes,
+            0x1d, 0x28, 0x6b, length % 0xff, length / 0xff, 0x31, 0x50, 0x30, bytes,
+        ]);
+
+        /* Print QR code */
+
+        this._queue([
             0x1d, 0x28, 0x6b, 0x03, 0x00, 0x31, 0x51, 0x30,
         ]);
 

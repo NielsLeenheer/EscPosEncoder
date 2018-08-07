@@ -197,10 +197,22 @@ The following symbologies can be used: 'upca', 'ean13', 'ean8', 'code39', 'itf',
 
 ### Qrcode
 
-Print a QR code. The first parameter is the value of the QR code.
+Print a QR code. The first parameter is the data of the QR code.
 
     let result = encoder
         .qrcode('https://nielsleenheer.com')
+        .encode()
+
+The qrcode function accepts the following additional parameters:
+
+- *model* - a number that can be 1 for Model 1 and 2 for Model 2
+- *size* - a number that can be between 1 and 8 for determining the size of the QR code
+- *errorlevel* - a string that can be either 'l', 'm', 'q' or 'h'.
+
+For example:
+
+    let result = encoder
+        .qrcode('https://nielsleenheer.com', 1, 8, 'h')
         .encode()
 
 
