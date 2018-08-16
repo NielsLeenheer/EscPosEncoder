@@ -479,7 +479,7 @@ class EscPosEncoder {
             case 'atkinson': image = Dither.atkinson(image); break;
         }
 
-        let getPixel = (x, y) => image.data[((width * y) + x) * 4] > 0 ? 1 : 0;
+        let getPixel = (x, y) => image.data[((width * y) + x) * 4] > 0 ? 0 : 1;
 
         let bytes = new Uint8Array((width * height) >> 3);
 

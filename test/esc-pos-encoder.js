@@ -178,8 +178,8 @@ describe('EscPosEncoder', function() {
 
         let result = encoder.image(canvas, 8, 8).encode();
                 
-        it('should be [ 29, 118, 48, 0, 1, 0, 8, 0, 127, 255, 255, 255, 255, 255, 255, 255 ]', function () {
-            assert.deepEqual(new Uint8Array([ 29, 118, 48, 0, 1, 0, 8, 0, 127, 255, 255, 255, 255, 255, 255, 255 ]), result);
+        it('should be [ 29, 118, 48, 0, 1, 0, 8, 0, 128, 0, 0, 0, 0, 0, 0, 0 ]', function () {
+            assert.deepEqual(new Uint8Array([ 29, 118, 48, 0, 1, 0, 8, 0, 128, 0, 0, 0, 0, 0, 0, 0 ]), result);
         });
     });
 
