@@ -16,7 +16,7 @@ Then, require the package and use it like so:
 
     let result = encoder
         .initialize()
-        .text('The quick brown fox jumps over the lazy dog)
+        .text('The quick brown fox jumps over the lazy dog')
         .newline()
         .qrcode('https://nielsleenheer.com')
         .encode();
