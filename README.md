@@ -26,6 +26,19 @@ All commands can be chained, except for `encode()` which will return the result 
 
 You can reuse the instantiated `EscPosEncoder` class to generate multiple commands or sets of commands for the same printer. It will remember settings like code page, so you don't have to specify that on subsequent use. That does rely on that previous commands were actually send to the printer. 
 
+## Usage (Ionic)
+
+On the page that you want to have the encoder, type this
+
+    import EscPosEncoder from 'esc-pos-encoder';
+    
+    declare var Socket: any;
+    
+Then inside the class method, you can access it by using:
+
+    const encoder = new EscPosEncoder();
+
+
 The following commands are available:
 
 ### Initialize
