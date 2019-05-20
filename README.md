@@ -1,4 +1,4 @@
-# esc-pos-encoder
+# esc-pos-encoder-ionic
 
 Create a set of commands that can be send to any receipt printer that supports ESC/POS
 This is ionic friendly, which mean you can use this for your ionic project too!
@@ -7,7 +7,7 @@ This is ionic friendly, which mean you can use this for your ionic project too!
 
 First, install the package using npm:
 
-    npm install esc-pos-encoder --save
+    npm install esc-pos-encoder-ionic --save
 
 Then, require the package and use it like so:
 
