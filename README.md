@@ -1,6 +1,8 @@
-# esc-pos-encoder
+# esc-pos-encoder-canvas
 
 Create a set of commands that can be send to any receipt printer that supports ESC/POS
+
+This fork adapts the new canvas exposes in ^2.6.0, which is broken in esc-pos-encoder@1.1.0
 
 ## Usage
 
