@@ -1,6 +1,6 @@
 const iconv = require('iconv-lite');
 const linewrap = require('linewrap');
-const Canvas = require('canvas-browserify');
+const { Canvas } = require('canvas');
 const Dither = require('canvas-dither');
 const Flatten = require('canvas-flatten');
 
