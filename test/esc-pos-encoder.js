@@ -206,6 +206,13 @@ describe('EscPosEncoder', function() {
             assert.deepEqual(new Uint8Array([ 27, 86, 01 ]), result);
         });
     });
+	
+	describe('setPrintMode(2,true, true, true, true)', function() {
+		let result = encoder.setPrintMode(2, true, true, true, true).encode();
+		it('should be [ 27, 33, 185 ]', function () {
+            assert.deepEqual(new Uint8Array([ 27, 33, 185 ]), result);
+        });
+	});
 
     describe('raw([ 0x1c, 0x2e ])', function () {
         let result = encoder.raw([ 0x1c, 0x2e ]).encode();
