@@ -32,8 +32,6 @@ On the page that you want to have the encoder, type this
 
     import EscPosEncoder from 'esc-pos-encoder';
     
-    declare var Socket: any;
-    
 Then inside the class method, you can access it by using:
 
     const encoder = new EscPosEncoder();

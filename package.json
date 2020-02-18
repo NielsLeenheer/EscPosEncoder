@@ -40,7 +40,6 @@
   "dependencies": {
     "buffer-to-uint8array": "^1.1.0",
     "canvas": "^2.6.1",
-    "canvas-browserify": "^1.1.3",
     "canvas-dither": "^1.0.0",
     "canvas-flatten": "^1.0.0",
     "iconv-lite": "^0.4.19",
