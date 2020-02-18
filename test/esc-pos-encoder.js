@@ -1,5 +1,5 @@
 const EscPosEncoder = require ('../src/esc-pos-encoder');
-const Canvas = require('canvas-browserify');
+const { Canvas } = require('canvas');
 
 const chai = require('chai');  
 const assert = chai.assert;
