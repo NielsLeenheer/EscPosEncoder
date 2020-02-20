@@ -1,6 +1,6 @@
 const iconv = require('iconv-lite');
 const linewrap = require('linewrap');
-const {Canvas} = require('canvas');
+const {createCanvas} = require('canvas');
 const Dither = require('canvas-dither');
 const Flatten = require('canvas-flatten');
 
@@ -465,7 +465,7 @@ class EscPosEncoder {
             threshold = 128;
         }
 
-        let canvas = new Canvas(width, height);
+        let canvas = createCanvas(width, height);
         let context = canvas.getContext('2d');
         context.drawImage(element, 0, 0, width, height);
         let image = context.getImageData(0, 0, width, height);
