@@ -30,7 +30,7 @@ You can reuse the instantiated `EscPosEncoder` class to generate multiple comman
 
 On the page that you want to have the encoder, type this
 
-    import EscPosEncoder from 'esc-pos-encoder';
+    import EscPosEncoder from 'esc-pos-encoder-ionic';
     
 Then inside the class method, you can access it by using:
 
