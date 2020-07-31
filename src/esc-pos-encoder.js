@@ -183,6 +183,11 @@ class EscPosEncoder {
         return this;
     }
 
+	lineNormalized(value, wrap){
+		this.line(this.normalize(value), wrap);
+		return this;
+	}
+	
     /**
      * Print text, followed by a newline
      *
@@ -601,6 +606,10 @@ class EscPosEncoder {
 
         return result;
     }
+	
+	normalize(text) {
+		return text.normalize("NFD").replace(/[\u0300-\u036f]/g, '');
+	}
 }
 
 module.exports = EscPosEncoder;
