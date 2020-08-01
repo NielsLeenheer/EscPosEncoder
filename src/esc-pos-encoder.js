@@ -183,6 +183,11 @@ class EscPosEncoder {
         return this;
     }
 
+	lineNormalized(value, wrap){
+		this.line(this.normalize(value), wrap);
+		return this;
+	}
+	
     /**
      * Print text, followed by a newline
      *
@@ -530,6 +535,30 @@ class EscPosEncoder {
     }
 
     /**
+     * Add set print mode commands
+     *
+     * @param  {number}           font   1 or 2
+     * @param  {boolean}          emphasize
+     * @param  {boolean}          doubleH
+     * @param  {boolean}          doubleW
+     * @param  {boolean}          underline
+     * @return {object}          Return the object, for easy chaining commands
+     *
+     */
+    setPrintMode(font, emphasize, doubleH, doubleW, underline) {
+        let param = 0;
+        //if font == 1 then 0 else 1
+        param += (font == 1 ? 0 : 1);
+        param += (emphasize ? 8 : 0);
+        param += (doubleH ? 16 : 0);
+        param += (doubleW ? 32 : 0);
+        param += (underline ? 128 : 0);
+        this._queue([ 0x1b, 0x21, param ]);
+        return this;
+    }
+
+
+    /**
      * Add raw printer commands
      *
      * @param  {array}           data   raw bytes to be included
@@ -577,6 +606,10 @@ class EscPosEncoder {
 
         return result;
     }
+	
+	normalize(text) {
+		return text.normalize("NFD").replace(/[\u0300-\u036f]/g, '');
+	}
 }
 
 module.exports = EscPosEncoder;
