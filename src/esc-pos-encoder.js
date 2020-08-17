@@ -99,6 +99,7 @@ class EscPosEncoder {
       'cp1252': [0x10, false],
       'iso88596': [0x16, false],
       'shiftjis': [0xfc, true],
+      'windows874': [0x1e, false],
       'windows1250': [0x48, false],
       'windows1251': [0x49, false],
       'windows1252': [0x47, false],

@@ -50,6 +50,14 @@ describe('EscPosEncoder', function() {
         });
     });
 
+    describe('codepage(cp874).text(กำลังทดสอบ) - thai', function () {
+        let result = encoder.codepage('cp874').text('กำลังทดสอบ').encode();
+        
+        it('should be [ 27, 116, 0, 104, 130, 108, 108, 111 ]', function () {
+            assert.deepEqual(new Uint8Array([ 27, 116, 30, 161, 211, 197, 209, 167, 183, 180, 202, 205, 186 ]), result);
+        });
+    });
+
     describe('codepage(cp936).text(简体中文) - simplified chinese', function () {
         let result = encoder.codepage('cp936').text('简体中文').encode();
         
