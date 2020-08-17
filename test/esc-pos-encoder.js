@@ -1,5 +1,5 @@
 const EscPosEncoder = require ('../src/esc-pos-encoder');
-const Canvas = require('canvas-browserify');
+const { createCanvas } = require('canvas');
 
 const chai = require('chai');  
 const assert = chai.assert;
@@ -171,7 +171,7 @@ describe('EscPosEncoder', function() {
     });
 
     describe('image(canvas, 8, 8) - with a black pixel at 0,0', function () {
-        let canvas = new Canvas(8, 8);
+        let canvas = createCanvas(8, 8);
         let context = canvas.getContext('2d');
         context.fillStyle = 'rgba(0, 0, 0, 1)';
         context.fillRect( 0, 0, 1, 1 );
