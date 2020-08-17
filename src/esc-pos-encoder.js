@@ -555,7 +555,7 @@ class EscPosEncoder {
     }
 
     this._queue([
-      0x1b, 0x56, data,
+      0x1d, 0x56, data,
     ]);
 
     return this;
