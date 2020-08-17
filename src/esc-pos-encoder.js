@@ -322,7 +322,8 @@ class EscPosEncoder {
       'upce': 0x01,
       'ean13': 0x02,
       'ean8': 0x03,
-      'coda39': 0x04,
+      'code39': 0x04,
+      'coda39': 0x04, /* typo, leave here for backwards compatibility */
       'itf': 0x05,
       'codabar': 0x06,
       'code93': 0x48,
