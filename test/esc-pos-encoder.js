@@ -170,6 +170,38 @@ describe('EscPosEncoder', function() {
         });
     });
 
+    describe('barcode(CODE128, code128, 60)', function () {
+        let result = encoder.barcode('CODE128', 'code128', 60).encode();
+        
+        it('should be [ 29, 104, 60, 29, 119, 3, 29, 107, 73, ... ]', function () {
+            assert.deepEqual(new Uint8Array([ 29, 104, 60, 29, 119, 3, 29, 107, 73, 9, 123, 66, 67, 79, 68, 69, 49, 50, 56 ]), result);
+        });
+    });
+
+    describe('barcode({ACODE128, code128, 60)', function () {
+        let result = encoder.barcode('{ACODE128', 'code128', 60).encode();
+        
+        it('should be [ 29, 104, 60, 29, 119, 3, 29, 107, 73, ... ]', function () {
+            assert.deepEqual(new Uint8Array([ 29, 104, 60, 29, 119, 3, 29, 107, 73, 9, 123, 65, 67, 79, 68, 69, 49, 50, 56 ]), result);
+        });
+    });
+
+    describe('barcode({BCODE128, code128, 60)', function () {
+        let result = encoder.barcode('{BCODE128', 'code128', 60).encode();
+        
+        it('should be [ 29, 104, 60, 29, 119, 3, 29, 107, 73, ... ]', function () {
+            assert.deepEqual(new Uint8Array([ 29, 104, 60, 29, 119, 3, 29, 107, 73, 9, 123, 66, 67, 79, 68, 69, 49, 50, 56 ]), result);
+        });
+    });
+
+    describe('barcode({C2Uc#, code128, 60)', function () {
+        let result = encoder.barcode('{C2Uc#', 'code128', 60).encode();
+        
+        it('should be [ 29, 104, 60, 29, 119, 3, 29, 107, 73, ... ]', function () {
+            assert.deepEqual(new Uint8Array([ 29, 104, 60, 29, 119, 3, 29, 107, 73, 6, 123, 67, 50, 85, 99, 35 ]), result);
+        });
+    });
+
     describe('image(canvas, 8, 8) - with a black pixel at 0,0', function () {
         let canvas = createCanvas(8, 8);
         let context = canvas.getContext('2d');

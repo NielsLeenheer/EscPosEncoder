@@ -325,6 +325,14 @@ class EscPosEncoder {
       'coda39': 0x04,
       'itf': 0x05,
       'codabar': 0x06,
+      'code93': 0x48,
+      'code128': 0x49,
+      'gs1-128': 0x50,
+      'gs1-databar-omni': 0x51,
+      'gs1-databar-truncated': 0x52,
+      'gs1-databar-limited': 0x53,
+      'gs1-databar-expanded': 0x54,
+      'code128-auto': 0x55,
     };
 
     if (symbology in symbologies) {
@@ -333,10 +341,34 @@ class EscPosEncoder {
       this._queue([
         0x1d, 0x68, height,
         0x1d, 0x77, symbology === 'code39' ? 0x02 : 0x03,
-        0x1d, 0x6b, symbologies[symbology],
-        bytes,
-        0x00,
       ]);
+
+      if (symbology == 'code128' && bytes[0] !== 0x7b) {
+        /* Not yet encodeded Code 128, assume data is Code B, which is similar to ASCII without control chars */
+
+        this._queue([
+          0x1d, 0x6b, symbologies[symbology],
+          bytes.length + 2,
+          0x7b, 0x42,
+          bytes,
+        ]);
+      } else if (symbologies[symbology] > 0x40) {
+        /* Function B symbologies */
+
+        this._queue([
+          0x1d, 0x6b, symbologies[symbology],
+          bytes.length,
+          bytes,
+        ]);
+      } else {
+        /* Function A symbologies */
+
+        this._queue([
+          0x1d, 0x6b, symbologies[symbology],
+          bytes,
+          0x00,
+        ]);
+      }
     } else {
       throw new Error('Symbology not supported by printer');
     }

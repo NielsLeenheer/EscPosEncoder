@@ -186,13 +186,69 @@ Change the text size. You can specify the size using a parameter which can be ei
 
 ### Barcode
 
-Print a barcode of a certain symbology. The first parameter is the value of the barcode, the second is the symbology and finally the height of the barcode.
+Print a barcode of a certain symbology. The first parameter is the value of the barcode as a string, the second is the symbology and finally the height of the barcode.
 
-The following symbologies can be used: 'upca', 'ean13', 'ean8', 'code39', 'itf', 'codabar'.
+The following symbologies can be used: 'upca', 'ean13', 'ean8', 'code39', 'itf', 'codabar', 'code93', 'code128', 'gs1-128', 'gs1-databar-omni', 'gs1-databar-truncated', 'gs1-databar-limited', 'gs1-databar-expanded', 'code128-auto'.
+
+_Just because the symbology is suppored by this library does not mean that the printer will actually support it. If the symbology is not supported, the barcode will simply not be printed, or the raw data will be printed instead, depending on the model and manufacturer of the printer._
+
+In general the printer will automatically calculate the checksum if one is not provided. If one is provided in the data, it will not check the checksum. If you provide the checksum yourself and it is not correctly calculated, the behaviour is not defined. It may calculate the correct checksum use that instead or print an invalid barcode. 
+
+For example with the checksum provided in the data:
 
     let result = encoder
         .barcode('3130630574613', 'ean13', 60)
         .encode()
+
+Or without a checksum:
+
+    let result = encoder
+        .barcode('313063057461', 'ean13', 60)
+        .encode()
+
+Both examples above should result in the same barcode being printed.
+
+Furthermore, depending on the symbology the data must be handled differently:
+
+| Symbology | Length | Characters |
+|-|-|-|
+| upca | 11 - 12 | 0 - 9 |
+| ean8 | 7 - 8 | 0 - 9 |
+| ean13 | 12 - 13 | 0 - 9 |
+| code39 | >= 1 | 0 - 9, A - Z, space, or $ % * + - . / |
+| itf | >= 2 (even) | 0 - 9 |
+| codabar | >= 2 | 0 - 9, A - D, a - d, or $ + − . / : |
+| code93 | 1 - 255 | ASCII character (0 - 127) |
+| code128 | 1 - 253 | ASCII character (32 - 127) |
+
+The Code 128 symbology specifies three different code sets which contain different characters. For example: CODE A contains ASCII control characters, special characters, digits and uppercase letters. CODE B contains special characters, digits, uppercase letters and lowercase letters. CODE C prints 2 digits numbers that correspond to the ASCII value of the letter.  
+
+By default Code 128 uses CODE B. It is possible to use a different code set, by using the code set selector character { followed by the uppercase letter of the character set.
+
+For example with the default CODE B set: 
+
+    let result = encoder
+        .barcode('CODE128 test', 'code128', 60)
+        .encode()
+
+Is equivalent to manually selecting CODE B:
+
+    let result = encoder
+        .barcode('{B' + 'CODE128 test', 'code128', 60)
+        .encode()
+
+And Code C only supports numbers, but you must encode it as a string:
+
+    let result = encoder
+        .barcode('{C' + '2Uc#', 'code128', 60)
+        .encode()
+
+If you look up the value of the characters in an ASCII table, you will see that 2 = 50, U = 85, c = 99 and # = 35.
+
+The printed barcode will be 50859935.
+
+All of the other symbologies require even more complicated encoding specified in the Espon ESC/POS printer language specification. To use these other symbologies you need to encode these barcodes yourself.
+
 
 
 ### Qrcode
