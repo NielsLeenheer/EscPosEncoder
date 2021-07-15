@@ -562,6 +562,20 @@ class EscPosEncoder {
 
     return this;
   }
+  
+   /**
+     * Open cash drawer
+     *
+     * @return {object}                      Return the object, for easy chaining commands
+     *
+     */
+  drawer() {
+    this._queue([
+      0x1b, 0x70, 0x30, 0x37, 0x79
+    ]);
+
+    return this;
+  }
 
   /**
      * Add raw printer commands
