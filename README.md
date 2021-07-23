@@ -21,21 +21,23 @@ Then, require the package and use it like so:
         .qrcode('https://nielsleenheer.com')
         .encode();
 
-All commands can be chained, except for `encode()` which will return the result as an Uint8Array which contains all the bytes that need to be send to the printer.
-
-You can reuse the instantiated `EscPosEncoder` class to generate multiple commands or sets of commands for the same printer. It will remember settings like code page, so you don't have to specify that on subsequent use. That does rely on that previous commands were actually send to the printer. 
-
-#### Legacy mode
+### Legacy mode
 
 Depending on how new your printer is you might want to use 'legacy' mode or 'modern' mode. The default is 'modern'. The main difference is how images are encoded. Some newer printers do not support the legacy way of encoding images, while some older printer do not support the modern way of encoding images. It may depend on the printer model what mode you should use.
 
 To opt in to 'legacy' mode you need to provide the constructor of the `EscPosEncoder` class with an options object with the property `legacy` set to `true`.
 
-    let encoder = new EscPosEncoder({ legacy: true });
+    let encoder = new EscPosEncoder({ 
+        legacy: true 
+    });
 
 _Note: In EscPosEncoder 1.x the 'legacy' mode was the default mode. This changed in EscPosEncoder 2.0 as 'modern' mode will be more future compatible._
 
+## Commands
 
+You can reuse the instantiated `EscPosEncoder` class to generate multiple commands or sets of commands for the same printer. It will remember settings like code page, so you don't have to specify that on subsequent use. That does rely on that previous commands were actually send to the printer. 
+
+All commands can be chained, except for `encode()` which will return the result as an Uint8Array which contains all the bytes that need to be send to the printer.
 
 The following commands are available:
 
@@ -179,7 +181,7 @@ Change the style to white text on a black background.
     let result = encoder
         .text('This is ')
         .invert()
-        .text('bold')
+        .text('white text on black')
         .invert()
         .encode()
 
@@ -188,7 +190,7 @@ It will try to remember the current state of the text style. But you can also pr
     let result = encoder
         .text('This is ')
         .invert(true)
-        .text('bold')
+        .text('white text on black')
         .invert(false)
         .encode()
 
@@ -363,7 +365,7 @@ The fifth paramter is the threshold that will be used by the threshold and bayer
     
     img.onload = function() {
         let result = encoder
-            .image(img, 300, 300, 'atkinson')
+            .image(img, 320, 320, 'atkinson')
             .encode()
     }
 
