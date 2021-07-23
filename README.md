@@ -172,6 +172,26 @@ It will try to remember the current state of the text style. But you can also pr
 
 Note: this text style is not supported by most receipt printers. 
 
+### Invert
+
+Change the style to white text on a black background. 
+
+    let result = encoder
+        .text('This is ')
+        .invert()
+        .text('bold')
+        .invert()
+        .encode()
+
+It will try to remember the current state of the text style. But you can also provide and additional parameter to force the text style to turn on and off.
+
+    let result = encoder
+        .text('This is ')
+        .invert(true)
+        .text('bold')
+        .invert(false)
+        .encode()
+
 ### Align
 
 Change the alignment of the text. You can specify the alignment using a parameter which can be either "left", "center" or "right".

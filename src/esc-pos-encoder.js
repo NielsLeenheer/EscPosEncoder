@@ -37,6 +37,7 @@ class EscPosEncoder {
       'bold': false,
       'italic': false,
       'underline': false,
+      'invert': false,
       'hanzi': false,
     };
   }
@@ -252,7 +253,7 @@ class EscPosEncoder {
   /**
      * Bold text
      *
-     * @param  {boolean}          value  true to turn on bold, false to turn off, or 2 for double underline
+     * @param  {boolean}          value  true to turn on bold, false to turn off
      * @return {object}                  Return the object, for easy chaining commands
      *
      */
@@ -265,6 +266,27 @@ class EscPosEncoder {
 
     this._queue([
       0x1b, 0x45, Number(value),
+    ]);
+
+    return this;
+  }
+
+  /**
+     * Invert text
+     *
+     * @param  {boolean}          value  true to turn on white text on black, false to turn off
+     * @return {object}                  Return the object, for easy chaining commands
+     *
+     */
+  invert(value) {
+    if (typeof value === 'undefined') {
+      value = ! this._state.invert;
+    }
+
+    this._state.invert = value;
+
+    this._queue([
+      0x1d, 0x42, Number(value),
     ]);
 
     return this;

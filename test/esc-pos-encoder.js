@@ -131,6 +131,14 @@ describe('EscPosEncoder', function() {
         });
     });
 
+    describe('invert().text(hello).invert()', function () {
+        let result = encoder.invert().text('hello').invert().encode();
+        
+        it('should be [ 29, 66, 1, ..., 29, 66, 0 ]', function () {
+            assert.deepEqual(new Uint8Array([ 29, 66, 1, 104, 101, 108, 108, 111, 29, 66, 0 ]), result);
+        });
+    });
+
     describe('align(left).line(hello)', function () {
         let result = encoder.align('left').line('hello').encode();
         
