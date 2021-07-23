@@ -25,6 +25,18 @@ All commands can be chained, except for `encode()` which will return the result 
 
 You can reuse the instantiated `EscPosEncoder` class to generate multiple commands or sets of commands for the same printer. It will remember settings like code page, so you don't have to specify that on subsequent use. That does rely on that previous commands were actually send to the printer. 
 
+#### Legacy mode
+
+Depending on how new your printer is you might want to use 'legacy' mode or 'modern' mode. The default is 'modern'. The main difference is how images are encoded. Some newer printers do not support the legacy way of encoding images, while some older printer do not support the modern way of encoding images. It may depend on the printer model what mode you should use.
+
+To opt in to 'legacy' mode you need to provide the constructor of the `EscPosEncoder` class with an options object with the property `legacy` set to `true`.
+
+    let encoder = new EscPosEncoder({ legacy: true });
+
+_Note: In EscPosEncoder 1.x the 'legacy' mode was the default mode. This changed in EscPosEncoder 2.0 as 'modern' mode will be more future compatible._
+
+
+
 The following commands are available:
 
 ### Initialize

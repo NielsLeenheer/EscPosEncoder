@@ -12,16 +12,24 @@ class EscPosEncoder {
   /**
      * Create a new object
      *
+     * @param  {object}   options   Object containing configuration options
     */
-  constructor() {
-    this._reset();
+  constructor(options) {
+    this._reset(options);
   }
 
   /**
      * Reset the state of the object
      *
+     * @param  {object}   options   Object containing configuration options
     */
-  _reset() {
+  _reset(options) {
+    options = Object.assign({
+      legacy: false,
+    }, options);
+
+    this._legacy = options.legacy;
+
     this._buffer = [];
     this._codepage = 'ascii';
 
@@ -513,31 +521,73 @@ class EscPosEncoder {
       case 'atkinson': image = Dither.atkinson(image); break;
     }
 
-    const getPixel = (x, y) => image.data[((width * y) + x) * 4] > 0 ? 0 : 1;
+    const getPixel = (x, y) => x < width && y < height ? (image.data[((width * y) + x) * 4] > 0 ? 0 : 1) : 0;
 
-    const bytes = new Uint8Array((width * height) >> 3);
+    const getColumnData = (width, height) => {
+      const data = [];
 
-    for (let y = 0; y < height; y++) {
-      for (let x = 0; x < width; x = x + 8) {
-        const i = (y * (width >> 3)) + (x >> 3);
-        bytes[i] =
-                    getPixel(x + 0, y) << 7 |
-                    getPixel(x + 1, y) << 6 |
-                    getPixel(x + 2, y) << 5 |
-                    getPixel(x + 3, y) << 4 |
-                    getPixel(x + 4, y) << 3 |
-                    getPixel(x + 5, y) << 2 |
-                    getPixel(x + 6, y) << 1 |
-                    getPixel(x + 7, y);
+      for (let s = 0; s < Math.ceil(height / 24); s++) {
+        const bytes = new Uint8Array(width * 3);
+
+        for (let x = 0; x < width; x++) {
+          for (let c = 0; c < 3; c++) {
+            for (let b = 0; b < 8; b++) {
+              bytes[(x * 3) + c] |= getPixel(x, (s * 24) + b + (8 * c)) << (7 - b);
+            }
+          }
+        }
+
+        data.push(bytes);
       }
+
+      return data;
+    };
+
+    const getRowData = (width, height) => {
+      const bytes = new Uint8Array((width * height) >> 3);
+
+      for (let y = 0; y < height; y++) {
+        for (let x = 0; x < width; x = x + 8) {
+          for (let b = 0; b < 8; b++) {
+            bytes[(y * (width >> 3)) + (x >> 3)] |= getPixel(x + b, y) << (7 - b);
+          }
+        }
+      }
+
+      return bytes;
+    };
+
+    /* Encode images with ESC * */
+
+    if (this._legacy == false) {
+      this._queue([
+        0x1b, 0x33, 0x24,
+      ]);
+
+      getColumnData(width, height).forEach((bytes) => {
+        this._queue([
+          0x1b, 0x2a, 0x21,
+          (width) & 0xff, (((width) >> 8) & 0xff),
+          bytes,
+          0x0a,
+        ]);
+      });
+
+      this._queue([
+        0x1b, 0x32,
+      ]);
     }
 
-    this._queue([
-      0x1d, 0x76, 0x30, 0x00,
-      (width >> 3) & 0xff, (((width >> 3) >> 8) & 0xff),
-      height & 0xff, ((height >> 8) & 0xff),
-      bytes,
-    ]);
+    /* Encode images with GS v */
+
+    if (this._legacy == true) {
+      this._queue([
+        0x1d, 0x76, 0x30, 0x00,
+        (width >> 3) & 0xff, (((width >> 3) >> 8) & 0xff),
+        height & 0xff, ((height >> 8) & 0xff),
+        getRowData(width, height)
+      ]);
+    }
 
     return this;
   }
