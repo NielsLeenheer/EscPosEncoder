@@ -211,9 +211,49 @@ Change the text size. You can specify the size using a parameter which can be ei
 
     let result = encoder
         .size('small')
-        .line('A line of small text)
+        .line('A line of small text')
         .size('normal')
-        .line('A line of normal text)
+        .line('A line of normal text')
+        .encode()
+
+### Width
+
+Change the text width. You can specify the width using a parameter which can be a number from 1 to 8.
+
+    let result = encoder
+        .width(2)
+        .line('A line of text twice as wide')
+        .width(3)
+        .line('A line of text three times as wide')
+        .width(1)
+        .line('A line of text with normal width')
+        .encode()
+
+Not all printers support all widths, it is probably best to not go over 4x at the most just to be safe.
+
+### Height
+
+Change the text height. You can specify the height using a parameter which can be a number from 1 to 8.
+
+    let result = encoder
+        .height(2)
+        .line('A line of text twice as high')
+        .height(3)
+        .line('A line of text three times as high')
+        .height(1)
+        .line('A line of text with normal height')
+        .encode()
+
+Not all printers support all heights, it is probably best to not go over 4x at the most just to be safe.
+
+Also, you can combine this command with the width command to make the text bigger. For example:
+
+    let result = encoder
+        .width(2)
+        .width(2)
+        .line('This text is twice as large as normal text')
+        .height(1)
+        .height(1)
         .encode()
 
 ### Barcode

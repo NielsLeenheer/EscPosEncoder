@@ -139,6 +139,30 @@ describe('EscPosEncoder', function() {
         });
     });
 
+    describe('width(2).text(hello).width(1)', function () {
+        let result = encoder.width(2).text('hello').width(1).encode();
+        
+        it('should be [ 29, 33, 16, ..., 29, 33, 0 ]', function () {
+            assert.deepEqual(new Uint8Array([ 29, 33, 16, 104, 101, 108, 108, 111, 29, 33, 0 ]), result);
+        });
+    });
+
+    describe('height(2).text(hello).height(1)', function () {
+        let result = encoder.height(2).text('hello').height(1).encode();
+        
+        it('should be [ 29, 33, 1, ..., 29, 33, 0 ]', function () {
+            assert.deepEqual(new Uint8Array([ 29, 33, 1, 104, 101, 108, 108, 111, 29, 33, 0 ]), result);
+        });
+    });
+
+    describe('width(2).height(2).text(hello).width(1).height(1)', function () {
+        let result = encoder.width(2).height(2).text('hello').width(1).height(1).encode();
+        
+        it('should be [ 29, 33, 16, 29, 33, 17, ..., 29, 33, 1, 29, 33, 0 ]', function () {
+            assert.deepEqual(new Uint8Array([ 29, 33, 16, 29, 33, 17, 104, 101, 108, 108, 111, 29, 33, 1, 29, 33, 0 ]), result);
+        });
+    });
+
     describe('align(left).line(hello)', function () {
         let result = encoder.align('left').line('hello').encode();
         

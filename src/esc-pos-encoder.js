@@ -39,6 +39,8 @@ class EscPosEncoder {
       'underline': false,
       'invert': false,
       'hanzi': false,
+      'width': 1,
+      'height': 1,
     };
   }
 
@@ -266,6 +268,64 @@ class EscPosEncoder {
 
     this._queue([
       0x1b, 0x45, Number(value),
+    ]);
+
+    return this;
+  }
+
+  /**
+     * Change width of text
+     *
+     * @param  {number}          width    The width of the text, 1 - 8
+     * @return {object}                   Return the object, for easy chaining commands
+     *
+     */
+  width(width) {
+    if (typeof width === 'undefined') {
+      width = 1;
+    }
+
+    if (typeof width !== 'number') {
+      throw new Error('Width must be a number');
+    }
+
+    if (width < 1 || width > 8) {
+      throw new Error('Width must be between 1 and 8');
+    }
+
+    this._state.width = width;
+
+    this._queue([
+      0x1d, 0x21, (this._state.height - 1) | (this._state.width - 1) << 4,
+    ]);
+
+    return this;
+  }
+
+  /**
+     * Change height of text
+     *
+     * @param  {number}          height  The height of the text, 1 - 8
+     * @return {object}                  Return the object, for easy chaining commands
+     *
+     */
+  height(height) {
+    if (typeof height === 'undefined') {
+      height = 1;
+    }
+
+    if (typeof height !== 'number') {
+      throw new Error('Height must be a number');
+    }
+
+    if (height < 1 || height > 8) {
+      throw new Error('Height must be between 1 and 8');
+    }
+
+    this._state.height = height;
+
+    this._queue([
+      0x1d, 0x21, (this._state.height - 1) | (this._state.width - 1) << 4,
     ]);
 
     return this;
