@@ -585,7 +585,7 @@ class EscPosEncoder {
         0x1d, 0x76, 0x30, 0x00,
         (width >> 3) & 0xff, (((width >> 3) >> 8) & 0xff),
         height & 0xff, ((height >> 8) & 0xff),
-        getRowData(width, height)
+        getRowData(width, height),
       ]);
     }
 
