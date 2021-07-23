@@ -269,6 +269,14 @@ describe('EscPosEncoder', function() {
         });
     });
 
+    describe('pulse()', function () {
+        let result = encoder.pulse().encode();
+        
+        it('should be [ 27, 112, 0, 50, 250 ]', function () {
+            assert.deepEqual(new Uint8Array([ 27, 112, 0, 50, 250 ]), result);
+        });
+    });
+
     describe('cut()', function () {
         let result = encoder.cut().encode();
         
