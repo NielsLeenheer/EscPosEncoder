@@ -9,7 +9,7 @@ const should = chai.should();
 
 describe('EscPosEncoder', function() {
     let encoder = new EscPosEncoder();
-    let legacyEncoder = new EscPosEncoder({ legacy: true });
+    let rasterEncoder = new EscPosEncoder({ imageMode: 'raster' });
 
     describe('text(hello)', function () {
         let result = encoder.text('hello').encode();
@@ -225,7 +225,7 @@ describe('EscPosEncoder', function() {
         context.fillStyle = 'rgba(0, 0, 0, 1)';
         context.fillRect( 0, 0, 1, 1 );
 
-        let result = legacyEncoder.image(canvas, 8, 8).encode();
+        let result = rasterEncoder.image(canvas, 8, 8).encode();
                 
         it('should be [ 29, 118, 48, 0, 1, 0, 8, 0, 128, 0, 0, 0, 0, 0, 0, 0 ]', function () {
             assert.deepEqual(new Uint8Array([ 29, 118, 48, 0, 1, 0, 8, 0, 128, 0, 0, 0, 0, 0, 0, 0 ]), result);

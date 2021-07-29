@@ -173,7 +173,7 @@ class EscPosEncoder {
     */
   _reset(options) {
     this._options = Object.assign({
-      legacy: false,
+      imageMode: 'column',
       codepageMapping: 'epson',
       codepageCandidates: [
         'cp437', 'cp858', 'cp860', 'cp861', 'cp863', 'cp865',
@@ -778,7 +778,7 @@ class EscPosEncoder {
 
     /* Encode images with ESC * */
 
-    if (this._options.legacy == false) {
+    if (this._options.imageMode == 'column') {
       this._queue([
         0x1b, 0x33, 0x24,
       ]);
@@ -799,7 +799,7 @@ class EscPosEncoder {
 
     /* Encode images with GS v */
 
-    if (this._options.legacy == true) {
+    if (this._options.imageMode == 'raster') {
       this._queue([
         0x1d, 0x76, 0x30, 0x00,
         (width >> 3) & 0xff, (((width >> 3) >> 8) & 0xff),
