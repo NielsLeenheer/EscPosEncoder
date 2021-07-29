@@ -1,8 +1,156 @@
-const iconv = require('iconv-lite');
 const linewrap = require('linewrap');
 const {createCanvas} = require('canvas');
 const Dither = require('canvas-dither');
 const Flatten = require('canvas-flatten');
+const CodepageEncoder = require('codepage-encoder');
+
+
+const codepageMappings = {
+  epson: {
+    'cp437': 0x00,
+    'shiftjis': 0x01,
+    'cp850': 0x02,
+    'cp860': 0x03,
+    'cp863': 0x04,
+    'cp865': 0x05,
+    'cp851': 0x0b,
+    'cp853': 0x0c,
+    'cp857': 0x0d,
+    'cp737': 0x0e,
+    'iso88597': 0x0f,
+    'windows1252': 0x10,
+    'cp866': 0x11,
+    'cp852': 0x12,
+    'cp858': 0x13,
+    'cp720': 0x20,
+    'cp775': 0x21,
+    'cp855': 0x22,
+    'cp861': 0x23,
+    'cp862': 0x24,
+    'cp864': 0x25,
+    'cp869': 0x26,
+    'iso88592': 0x27,
+    'iso885915': 0x28,
+    'cp1098': 0x29,
+    'cp1118': 0x2a,
+    'cp1119': 0x2b,
+    'cp1125': 0x2c,
+    'windows1250': 0x2d,
+    'windows1251': 0x2e,
+    'windows1253': 0x2f,
+    'windows1254': 0x30,
+    'windows1255': 0x31,
+    'windows1256': 0x32,
+    'windows1257': 0x33,
+    'windows1258': 0x34,
+    'rk1048': 0x35,
+  },
+
+  zjiang: {
+    'cp437': 0x00,
+    'shiftjis': 0x01,
+    'cp850': 0x02,
+    'cp860': 0x03,
+    'cp863': 0x04,
+    'cp865': 0x05,
+    'windows1252': 0x10,
+    'cp866': 0x11,
+    'cp852': 0x12,
+    'cp858': 0x13,
+    'windows1255': 0x20,
+    'cp861': 0x38,
+    'cp855': 0x3c,
+    'cp857': 0x3d,
+    'cp862': 0x3e,
+    'cp864': 0x3f,
+    'cp737': 0x40,
+    'cp851': 0x41,
+    'cp869': 0x42,
+    'cp1119': 0x44,
+    'cp1118': 0x45,
+    'windows1250': 0x48,
+    'windows1251': 0x49,
+    'cp3840': 0x4a,
+    'cp3843': 0x4c,
+    'cp3844': 0x4d,
+    'cp3845': 0x4e,
+    'cp3846': 0x4f,
+    'cp3847': 0x50,
+    'cp3848': 0x51,
+    'cp2001': 0x53,
+    'cp3001': 0x54,
+    'cp3002': 0x55,
+    'cp3011': 0x56,
+    'cp3012': 0x57,
+    'cp3021': 0x58,
+    'cp3041': 0x59,
+    'windows1253': 0x5a,
+    'windows1254': 0x5b,
+    'windows1256': 0x5c,
+    'cp720': 0x5d,
+    'windows1258': 0x5e,
+    'cp775': 0x5f,
+  },
+
+  bixolon: {
+    'cp437': 0x00,
+    'shiftjis': 0x01,
+    'cp850': 0x02,
+    'cp860': 0x03,
+    'cp863': 0x04,
+    'cp865': 0x05,
+    'cp851': 0x0b,
+    'cp858': 0x13,
+  },
+
+  star: {
+    'cp437': 0x00,
+    'shiftjis': 0x01,
+    'cp850': 0x02,
+    'cp860': 0x03,
+    'cp863': 0x04,
+    'cp865': 0x05,
+    'windows1252': 0x10,
+    'cp866': 0x11,
+    'cp852': 0x12,
+    'cp858': 0x13,
+  },
+
+  legacy: {
+    'cp437': 0x00,
+    'cp737': 0x40,
+    'cp850': 0x02,
+    'cp775': 0x5f,
+    'cp852': 0x12,
+    'cp855': 0x3c,
+    'cp857': 0x3d,
+    'cp858': 0x13,
+    'cp860': 0x03,
+    'cp861': 0x38,
+    'cp862': 0x3e,
+    'cp863': 0x04,
+    'cp864': 0x1c,
+    'cp865': 0x05,
+    'cp866': 0x11,
+    'cp869': 0x42,
+    'cp936': 0xff,
+    'cp949': 0xfd,
+    'cp950': 0xfe,
+    'cp1252': 0x10,
+    'iso88596': 0x16,
+    'shiftjis': 0xfc,
+    'windows874': 0x1e,
+    'windows1250': 0x48,
+    'windows1251': 0x49,
+    'windows1252': 0x47,
+    'windows1253': 0x5a,
+    'windows1254': 0x5b,
+    'windows1255': 0x20,
+    'windows1256': 0x5c,
+    'windows1257': 0x19,
+    'windows1258': 0x5e,
+  },
+};
 
 
 /**
@@ -24,11 +172,14 @@ class EscPosEncoder {
      * @param  {object}   options   Object containing configuration options
     */
   _reset(options) {
-    options = Object.assign({
+    this._options = Object.assign({
       legacy: false,
+      codepageMapping: 'epson',
+      codepageCandidates: [
+        'cp437', 'cp858', 'cp860', 'cp861', 'cp863', 'cp865',
+        'cp852', 'cp857', 'cp855', 'cp866', 'cp869',
+      ],
     }, options);
-
-    this._legacy = options.legacy;
 
     this._buffer = [];
     this._codepage = 'ascii';
@@ -52,7 +203,35 @@ class EscPosEncoder {
      *
     */
   _encode(value) {
-    return iconv.encode(value, this._codepage);
+    if (this._codepage != 'auto') {
+      return CodepageEncoder.encode(value, this._codepage);
+    }
+
+    let codepages;
+
+    if (typeof this._options.codepageMapping == 'string') {
+      codepages = codepageMappings[this._options.codepageMapping];
+    } else {
+      codepages = this._options.codepageMapping;
+    }
+
+    const fragments = CodepageEncoder.autoEncode(value, this._options.codepageCandidates);
+
+    let length = 0;
+    for (let f = 0; f < fragments.length; f++) {
+      length += 3 + fragments[f].bytes.byteLength;
+    }
+
+    const buffer = new Uint8Array(length);
+    let i = 0;
+
+    for (let f = 0; f < fragments.length; f++) {
+      buffer.set([0x1b, 0x74, codepages[fragments[f].codepage]], i);
+      buffer.set(fragments[f].bytes, i + 3);
+      i += 3 + fragments[f].bytes.byteLength;
+    }
+
+    return buffer;
   }
 
   /**
@@ -82,68 +261,32 @@ class EscPosEncoder {
   /**
      * Change the code page
      *
-     * @param  {string}   value  The codepage that we set the printer to
-     * @return {object}          Return the object, for easy chaining commands
+     * @param  {string}   codepage  The codepage that we set the printer to
+     * @return {object}             Return the object, for easy chaining commands
      *
      */
-  codepage(value) {
-    const codepages = {
-      'cp437': [0x00, false],
-      'cp737': [0x40, false],
-      'cp850': [0x02, false],
-      'cp775': [0x5f, false],
-      'cp852': [0x12, false],
-      'cp855': [0x3c, false],
-      'cp857': [0x3d, false],
-      'cp858': [0x13, false],
-      'cp860': [0x03, false],
-      'cp861': [0x38, false],
-      'cp862': [0x3e, false],
-      'cp863': [0x04, false],
-      'cp864': [0x1c, false],
-      'cp865': [0x05, false],
-      'cp866': [0x11, false],
-      'cp869': [0x42, false],
-      'cp936': [0xff, true],
-      'cp949': [0xfd, true],
-      'cp950': [0xfe, true],
-      'cp1252': [0x10, false],
-      'iso88596': [0x16, false],
-      'shiftjis': [0xfc, true],
-      'windows874': [0x1e, false],
-      'windows1250': [0x48, false],
-      'windows1251': [0x49, false],
-      'windows1252': [0x47, false],
-      'windows1253': [0x5a, false],
-      'windows1254': [0x5b, false],
-      'windows1255': [0x20, false],
-      'windows1256': [0x5c, false],
-      'windows1257': [0x19, false],
-      'windows1258': [0x5e, false],
-    };
+  codepage(codepage) {
+    if (codepage === 'auto') {
+      this._codepage = codepage;
+      return this;
+    }
 
-    let codepage;
-
-    if (!iconv.encodingExists(value)) {
+    if (!CodepageEncoder.supports(codepage)) {
       throw new Error('Unknown codepage');
     }
 
-    if (value in iconv.encodings) {
-      if (typeof iconv.encodings[value] === 'string') {
-        codepage = iconv.encodings[value];
-      } else {
-        codepage = value;
-      }
+    let codepages;
+
+    if (typeof this._options.codepageMapping == 'string') {
+      codepages = codepageMappings[this._options.codepageMapping];
     } else {
-      throw new Error('Unknown codepage');
+      codepages = this._options.codepageMapping;
     }
 
     if (typeof codepages[codepage] !== 'undefined') {
       this._codepage = codepage;
-      this._state.hanzi = codepages[codepage][1];
-
       this._queue([
-        0x1b, 0x74, codepages[codepage][0],
+        0x1b, 0x74, codepages[codepage],
       ]);
     } else {
       throw new Error('Codepage not supported by printer');
@@ -168,15 +311,9 @@ class EscPosEncoder {
 
     const bytes = this._encode(value);
 
-    if (this._state.hanzi) {
-      this._queue([
-        0x1c, 0x26, bytes, 0x1c, 0x2e,
-      ]);
-    } else {
-      this._queue([
-        bytes,
-      ]);
-    }
+    this._queue([
+      bytes,
+    ]);
 
     return this;
   }
@@ -428,7 +565,7 @@ class EscPosEncoder {
     };
 
     if (symbology in symbologies) {
-      const bytes = iconv.encode(value, 'ascii');
+      const bytes = CodepageEncoder.encode(value, 'ascii');
 
       this._queue([
         0x1d, 0x68, height,
@@ -545,7 +682,7 @@ class EscPosEncoder {
 
     /* Data */
 
-    const bytes = iconv.encode(value, 'iso88591');
+    const bytes = CodepageEncoder.encode(value, 'iso88591');
     const length = bytes.length + 3;
 
     this._queue([
@@ -641,7 +778,7 @@ class EscPosEncoder {
 
     /* Encode images with ESC * */
 
-    if (this._legacy == false) {
+    if (this._options.legacy == false) {
       this._queue([
         0x1b, 0x33, 0x24,
       ]);
@@ -662,7 +799,7 @@ class EscPosEncoder {
 
     /* Encode images with GS v */
 
-    if (this._legacy == true) {
+    if (this._options.legacy == true) {
       this._queue([
         0x1d, 0x76, 0x30, 0x00,
         (width >> 3) & 0xff, (((width >> 3) >> 8) & 0xff),

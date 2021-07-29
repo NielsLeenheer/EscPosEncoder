@@ -1,6 +1,8 @@
 # esc-pos-encoder
 
-Create a set of commands that can be send to any receipt printer that supports ESC/POS
+Create a set of commands that can be send to any receipt printer that supports ESC/POS.
+
+Before you use this library, you should also consider [ThermalPrinterEncoder](https://github.com/NielsLeenheer/ThermalPrinterEncoder), which is based on [EscPosEncoder](https://github.com/NielsLeenheer/EscPosEncoder), but also adds support for the StarPRNT language by using [StarPrntEncoder](https://github.com/NielsLeenheer/StarPrntEncoder). The API of ThermalPrinter is identical to this one and you should just be able to swap it out without any further changes.
 
 ## Usage
 
@@ -60,11 +62,77 @@ If you don't specify a code page, it will assume you want to print only ASCII ch
     let result = encoder
         .codepage('windows1251')
         .text('Iñtërnâtiônàlizætiøn')
-        .codepage('cp936')
-        .text('简体中文')
+        .codepage('cp737')
+        .text('ξεσκεπάζω την ψυχοφθόρα βδελυγμία')
         .encode()
 
-The following code pages are supported: cp437, cp737, cp850, cp775, cp852, cp855, cp857, cp858, cp860, cp861, cp862, cp863, cp864, cp865, cp866, cp869, cp874, cp936, cp949, cp950, cp1252, iso88596, shiftjis, windows1250, windows1251, windows1252, windows1253, windows1254, windows1255, windows1256, windows1257, windows1258.
+The following code pages are supported: cp437, cp720, cp737, cp775, cp850, cp851, cp852, cp853, cp855, cp857, cp858, cp860, cp861, cp862, cp863, cp864, cp865, cp866, cp869, cp874, cp922, cp1098, cp1118, cp1119, cp1125, cp2001, cp3001, cp3002, cp3011, cp3012, cp3021, cp3041, cp3840, cp3841, cp3843, cp3844, cp3845, cp3846, cp3847, cp3848, iso885915, iso88592, iso88597, rk1048, windows1250, windows1251, windows1252, windows1253, windows1254, windows1255, windows1256, windows1257, windows1258.
+
+#### Printer support
+
+Support for one specific code pages is not only dependant on this library, even more important is that the printer understands it. And support for code pages depend on manufacturer and model. Some only support a few, some support most of these. There are probably no printers that support all of them. 
+
+Before choosing a code page, check the technical manual of your printer which codepages are supported. If your printer does not support a code page that you need, you are out of luck and nothing this library does can help you solve this problem. 
+
+#### Advanced text compositing
+
+For some languages it might even be better to print text as an image, because receipt printers do not support advanced text compositing required by some languages, such as Arabic. You can do this by creating a Canvas and drawing your text on there. When finished, you can then use the canvas as a parameter of the `.image()` method to send it to the printer.
+
+#### Code page mappings
+
+By default this library uses the Epson code page mappings and Epson printers will support most of the code pages out of the box. However, other manufacturers might support the same code pages, but use a different mapping. That means that even though
+the printer supports the code page, the way to activate it is different for that printer. This library does support a number of code page mappings for other manufacturers, such as `bixolon`, `zjiang` and `star` (in ESC/POS emulation mode).
+
+You can activate these alternative mappings with a parameter when the library is instantiated:
+
+    let encoder = new EscPosEncoder({ 
+        codepageMapping: 'bixolon' 
+    });
+
+If you want to use a code page mapping that is specific to your printer, you can also specify an object with the correct mappings:
+
+    let encoder = new EscPosEncoder({ 
+        codepageMapping: {
+            'cp437': 0x00,
+            'cp850': 0x02,
+            'cp860': 0x03,
+            'cp863': 0x04,
+            'cp865': 0x05,
+            'cp851': 0x0b,
+            'cp858': 0x13,
+        } 
+    });
+
+Each property name must be one of the code pages supported by this library and the value is the number which is used for that code page on your printer. 
+
+
+#### Auto encoding
+
+It is also possible to enable auto encoding of code pages. The library will then automatically switch between code pages depending on the text that you want to print. 
+
+    let result = encoder
+        .codepage('auto')
+        .text('Iñtërnâtiônàlizætiøn')
+        .text('διεθνοποίηση')
+        .text('интернационализация')
+        .encode()
+
+Or even mix code pages within the same text:
+
+    let result = encoder
+        .codepage('auto')
+        .text('You can mix ελληνική γλώσσα and русский язык')
+        .encode()
+
+By default the library only considers some of the most common code pages when detecting the right code page for each letter. If you want to add another code page candidate or remove on, because it is not supported by your printer, you can. You can customize the candidate code pages by setting an option during instantiation of the library:
+
+    let encoder = new EscPosEncoder({ 
+        codepageCandidates: [
+            'cp437', 'cp858', 'cp860', 'cp861', 'cp863', 'cp865',
+            'cp852', 'cp857', 'cp855', 'cp866', 'cp869',
+        ]
+    });
+
 
 ### Text
 
@@ -399,7 +467,7 @@ The third parameter is how long there should be a delay after the pulse has been
 
 ### Raw
 
-Add raw printer commands, in case you want to send a command that this library does not support natively. For example the following command is to turn of Hanzi character mode.
+Add raw printer commands, in case you want to send a command that this library does not support natively. For example the following command is to turn of Kanji character mode.
 
     let result = encoder
         .raw([ 0x1c, 0x2e ])

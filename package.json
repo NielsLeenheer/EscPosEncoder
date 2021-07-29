@@ -29,18 +29,19 @@
   "homepage": "https://github.com/NielsLeenheer/EscPosEncoder#readme",
   "devDependencies": {
     "browserify": "^17.0.0",
+    "buffer-to-uint8array": "^1.1.0",
     "chai": "^4.3.4",
     "eslint": "^7.31.0",
     "eslint-config-google": "^0.14.0",
+    "iconv-lite": "^0.6.3",
     "mocha": "^9.0.2",
     "uglify-es": "^3.3.9"
   },
   "dependencies": {
-    "buffer-to-uint8array": "^1.1.0",
     "canvas": "^2.8.0",
     "canvas-dither": "^1.0.1",
     "canvas-flatten": "^1.0.1",
-    "iconv-lite": "^0.6.3",
+    "codepage-encoder": "^1.0.0",
     "linewrap": "^0.2.1"
   }
 }

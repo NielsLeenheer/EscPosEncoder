@@ -51,35 +51,11 @@ describe('EscPosEncoder', function() {
         });
     });
 
-    describe('codepage(cp874).text(กำลังทดสอบ) - thai', function () {
-        let result = encoder.codepage('cp874').text('กำลังทดสอบ').encode();
+    describe('codepage(windows1252).text(héllo) - é -> 233', function () {
+        let result = encoder.codepage('windows1252').text('héllo').encode();
         
-        it('should be [ 27, 116, 0, 104, 130, 108, 108, 111 ]', function () {
-            assert.deepEqual(new Uint8Array([ 27, 116, 30, 161, 211, 197, 209, 167, 183, 180, 202, 205, 186 ]), result);
-        });
-    });
-
-    describe('codepage(cp936).text(简体中文) - simplified chinese', function () {
-        let result = encoder.codepage('cp936').text('简体中文').encode();
-        
-        it('should be [ 27, 116, 255, 28, 38, 188, 242, 204, 229, 214, 208, 206, 196, 28, 46 ]', function () {
-            assert.deepEqual(new Uint8Array([ 27, 116, 255, 28, 38, 188, 242, 204, 229, 214, 208, 206, 196, 28, 46 ]), result);
-        });
-    });
-
-    describe('codepage(win1252).text(héllo) - é -> 233', function () {
-        let result = encoder.codepage('win1252').text('héllo').encode();
-        
-        it('should be [ 27, 116, 71, 104, 233, 108, 108, 111 ]', function () {
-            assert.deepEqual(new Uint8Array([ 27, 116, 71, 104, 233, 108, 108, 111 ]), result);
-        });
-    });
-
-    describe('codepage(utf8).text(héllo)', function () {
-        it('should throw an "Codepage not supported by printer" error', function () {
-            expect(function(){
-                let result = encoder.codepage('utf8').text('héllo').encode();
-            }).to.throw('Codepage not supported by printer');
+        it('should be [ 27, 116, 16, 104, 233, 108, 108, 111 ]', function () {
+            assert.deepEqual(new Uint8Array([ 27, 116, 16, 104, 233, 108, 108, 111 ]), result);
         });
     });
 
@@ -306,6 +282,14 @@ describe('EscPosEncoder', function() {
         
         it('should be [ 28, 46 ]', function () {
             assert.deepEqual(new Uint8Array([ 28, 46 ]), result);
+        });
+    });
+
+    describe('codepage(auto).text(héψжł)', function () {
+        let result = encoder.codepage('auto').text('héψжł').encode();
+        
+        it('should be [27, 116, 0, 104, 130, 27, 116, 38, 246, 27, 116, 34, 233, 27, 116, 18, 136]', function () {
+            assert.deepEqual(new Uint8Array([27, 116, 0, 104, 130, 27, 116, 38, 246, 27, 116, 34, 233, 27, 116, 18, 136]), result);
         });
     });
 });
