@@ -173,6 +173,9 @@ class EscPosEncoder {
     */
   _reset(options) {
     this._options = Object.assign({
+      width: null,
+      embedded: false,
+      wordWrap: true,
       imageMode: 'column',
       codepageMapping: 'epson',
       codepageCandidates: [
@@ -181,15 +184,20 @@ class EscPosEncoder {
       ],
     }, options);
 
+    this._embedded = this._options.width && this._options.embedded;
+
     this._buffer = [];
+    this._queued = [];
+    this._cursor = 0;
     this._codepage = 'ascii';
 
     this._state = {
+      'codepage': 0,
+      'align': 'left',
       'bold': false,
       'italic': false,
       'underline': false,
       'invert': false,
-      'hanzi': false,
       'width': 1,
       'height': 1,
     };
@@ -229,21 +237,113 @@ class EscPosEncoder {
       buffer.set([0x1b, 0x74, codepages[fragments[f].codepage]], i);
       buffer.set(fragments[f].bytes, i + 3);
       i += 3 + fragments[f].bytes.byteLength;
+
+      this._state.codepage = codepages[fragments[f].codepage];
     }
 
     return buffer;
   }
 
   /**
-     * Add commands to the buffer
+     * Add commands to the queue
      *
-     * @param  {array}   value  And array of numbers, arrays, buffers or Uint8Arrays to add to the buffer
+     * @param  {array}   value  Add array of numbers, arrays, buffers or Uint8Arrays to add to the buffer
      *
     */
   _queue(value) {
-    value.forEach((item) => this._buffer.push(item));
+    value.forEach((item) => this._queued.push(item));
   }
 
+  /**
+     * Flush current queue to the buffer
+     *
+    */
+  _flush() {
+    if (this._embedded) {
+      let indent = this._options.width - this._cursor;
+
+      if (this._state.align == 'left') {
+        this._queued.push((new Array(indent)).fill(0x20));
+      }
+
+      if (this._state.align == 'center') {
+        const remainder = indent % 2;
+        indent = indent >> 1;
+
+        if (indent > 0) {
+          this._queued.push((new Array(indent)).fill(0x20));
+        }
+
+        if (indent + remainder > 0) {
+          this._queued.unshift((new Array(indent + remainder)).fill(0x20));
+        }
+      }
+
+      if (this._state.align == 'right') {
+        this._queued.unshift((new Array(indent)).fill(0x20));
+      }
+    }
+
+    this._buffer = this._buffer.concat(this._queued);
+
+    this._queued = [];
+    this._cursor = 0;
+  }
+
+  /**
+     * Wrap the text while respecting the position of the cursor
+     *
+     * @param  {string}   value     String to wrap after the width of the paper has been reached
+     * @param  {number}   position  Position on which to force a wrap
+     * @return {array}              Array with each line
+    */
+  _wrap(value, position) {
+    if (position || (this._options.wordWrap && this._options.width)) {
+      const indent = '-'.repeat(this._cursor);
+      const w = linewrap(position || this._options.width, {lineBreak: '\n', whitespace: 'all'});
+      const result = w(indent + value).substring(this._cursor).split('\n');
+
+      return result;
+    }
+
+    return [value];
+  }
+
+  /**
+     * Restore styles and codepages after drawing boxes or lines
+    */
+  _restoreState() {
+    this.bold(this._state.bold);
+    this.italic(this._state.italic);
+    this.underline(this._state.underline);
+    this.invert(this._state.invert);
+
+    this._queue([
+      0x1b, 0x74, this._state.codepage,
+    ]);
+  }
+
+  /**
+     * Get code page identifier for the specified code page and mapping
+     *
+     * @param  {string}   codepage  Required code page
+     * @return {number}             Identifier for the current printer according to the specified mapping
+    */
+  _getCodepageIdentifier(codepage) {
+    let codepages;
+
+    if (typeof this._options.codepageMapping == 'string') {
+      codepages = codepageMappings[this._options.codepageMapping];
+    } else {
+      codepages = this._options.codepageMapping;
+    }
+
+    return codepages[codepage];
+  }
+
+
+
+  
   /**
      * Initialize the printer
      *
@@ -254,6 +354,8 @@ class EscPosEncoder {
     this._queue([
       0x1b, 0x40,
     ]);
+
+    this._flush();
 
     return this;
   }
@@ -285,6 +387,8 @@ class EscPosEncoder {
 
     if (typeof codepages[codepage] !== 'undefined') {
       this._codepage = codepage;
+      this._state.codepage = codepages[codepage];
+
       this._queue([
         0x1b, 0x74, codepages[codepage],
       ]);
@@ -304,16 +408,25 @@ class EscPosEncoder {
      *
      */
   text(value, wrap) {
-    if (wrap) {
-      const w = linewrap(wrap, {lineBreak: '\r\n'});
-      value = w(value);
+    const lines = this._wrap(value, wrap);
+
+    for (let l = 0; l < lines.length; l++) {
+      const bytes = this._encode(lines[l]);
+
+      this._queue([
+        bytes,
+      ]);
+
+      this._cursor += (lines[l].length * this._state.width);
+
+      if (this._options.width && !this._embedded) {
+        this._cursor = this._cursor % this._options.width;
+      }
+
+      if (l < lines.length - 1) {
+        this.newline();
+      }
     }
-
-    const bytes = this._encode(value);
-
-    this._queue([
-      bytes,
-    ]);
 
     return this;
   }
@@ -325,9 +438,15 @@ class EscPosEncoder {
      *
      */
   newline() {
+    this._flush();
+
     this._queue([
       0x0a, 0x0d,
     ]);
+
+    if (this._embedded) {
+      this._restoreState();
+    }
 
     return this;
   }
@@ -525,12 +644,296 @@ class EscPosEncoder {
     };
 
     if (value in alignments) {
-      this._queue([
-        0x1b, 0x61, alignments[value],
-      ]);
+      this._state.align = value;
+
+      if (!this._embedded) {
+        this._queue([
+          0x1b, 0x61, alignments[value],
+        ]);
+      }
     } else {
       throw new Error('Unknown alignment');
     }
+
+    return this;
+  }
+
+  /**
+     * Insert a table
+     *
+     * @param  {array}           columns  The column definitions
+     * @param  {array}           data     Array containing rows. Each row is an array containing cells.
+     *                                    Each cell can be a string value, or a callback function.
+     *                                    The first parameter of the callback is the encoder object on
+     *                                    which the function can call its methods.
+     * @return {object}                   Return the object, for easy chaining commands
+     *
+     */
+  table(columns, data) {
+    if (this._cursor != 0) {
+      this.newline();
+    }
+
+    for (let r = 0; r < data.length; r++) {
+      const lines = [];
+      let maxLines = 0;
+
+      for (let c = 0; c < columns.length; c++) {
+        const cell = [];
+
+        if (typeof data[r][c] === 'string') {
+          const w = linewrap(columns[c].width, {lineBreak: '\n'});
+          const fragments = w(data[r][c]).split('\n');
+
+          for (let f = 0; f < fragments.length; f++) {
+            if (columns[c].align == 'right') {
+              cell[f] = this._encode(fragments[f].padStart(columns[c].width));
+            } else {
+              cell[f] = this._encode(fragments[f].padEnd(columns[c].width));
+            }
+          }
+        }
+
+        if (typeof data[r][c] === 'function') {
+          const columnEncoder = new EscPosEncoder(Object.assign({}, this._options, {
+            width: columns[c].width,
+            embedded: true,
+          }));
+
+          columnEncoder._codepage = this._codepage;
+          columnEncoder.align(columns[c].align);
+          data[r][c](columnEncoder);
+          const encoded = columnEncoder.encode();
+
+          let fragment = [];
+
+          for (let e = 0; e < encoded.byteLength; e++) {
+            if (e < encoded.byteLength - 1) {
+              if (encoded[e] === 0x0a && encoded[e + 1] === 0x0d) {
+                cell.push(fragment);
+                fragment = [];
+
+                e++;
+                continue;
+              }
+            }
+
+            fragment.push(encoded[e]);
+          }
+
+          if (fragment.length) {
+            cell.push(fragment);
+          }
+        }
+
+        maxLines = Math.max(maxLines, cell.length);
+        lines[c] = cell;
+      }
+
+      for (let c = 0; c < columns.length; c++) {
+        if (lines[c].length < maxLines) {
+          for (let p = lines[c].length; p < maxLines; p++) {
+            let verticalAlign = 'top';
+            if (typeof columns[c].verticalAlign !== 'undefined') {
+              verticalAlign = columns[c].verticalAlign;
+            }
+
+            if (verticalAlign == 'bottom') {
+              lines[c].unshift((new Array(columns[c].width)).fill(0x20));
+            } else {
+              lines[c].push((new Array(columns[c].width)).fill(0x20));
+            }
+          }
+        }
+      }
+
+      for (let l = 0; l < maxLines; l++) {
+        for (let c = 0; c < columns.length; c++) {
+          if (typeof columns[c].marginLeft !== 'undefined') {
+            this.raw((new Array(columns[c].marginLeft)).fill(0x20));
+          }
+
+          this.raw(lines[c][l]);
+
+          if (typeof columns[c].marginRight !== 'undefined') {
+            this.raw((new Array(columns[c].marginRight)).fill(0x20));
+          }
+        }
+
+        this.newline();
+      }
+    }
+
+    return this;
+  }
+
+  /**
+     * Insert a horizontal rule
+     *
+     * @param  {object}          options  And object with the following properties:
+     *                                    - style: The style of the line, either single or double
+     *                                    - width: The width of the line, by default the width of the paper
+     * @return {object}                   Return the object, for easy chaining commands
+     *
+     */
+  rule(options) {
+    options = Object.assign({
+      style: 'single',
+      width: this._options.width || 10,
+    }, options || {});
+
+    this._queue([
+      0x1b, 0x74, this._getCodepageIdentifier('cp437'),
+      (new Array(options.width)).fill(options.style === 'double' ? 0xcd : 0xc4),
+    ]);
+
+    this._queue([
+      0x1b, 0x74, this._state.codepage,
+    ]);
+
+    this.newline();
+
+    return this;
+  }
+
+  /**
+     * Insert a horizontal rule
+     *
+     * @param  {object}           options   And object with the following properties:
+     *                                      - style: The style of the border, either single or double
+     *                                      - width: The width of the box, by default the width of the paper, if specified
+     *                                      - marginLeft: Space between the left border and the left side of the paper
+     *                                      - marginRight: Space between the right border and the right side of the paper
+     *                                      - paddingLeft: Space between the contents and the left border of the box
+     *                                      - paddingRight: Space between the contents and the right border of the box
+     * @param  {string|function}  contents  A string value, or a callback function.
+     *                                      The first parameter of the callback is the encoder object on
+     *                                      which the function can call its methods.
+     * @return {object}                     Return the object, for easy chaining commands
+     *
+     */
+  box(options, contents) {
+    options = Object.assign({
+      style: 'single',
+      width: this._options.width || 30,
+      marginLeft: 0,
+      marginRight: 0,
+      paddingLeft: 0,
+      paddingRight: 0,
+    }, options || {});
+
+    let elements;
+
+    if (options.style == 'double') {
+      elements = [0xc9, 0xbb, 0xc8, 0xbc, 0xcd, 0xba]; // ╔╗╚╝═║
+    } else {
+      elements = [0xda, 0xbf, 0xc0, 0xd9, 0xc4, 0xb3]; // ┌┐└┘─│
+    }
+
+    if (this._cursor != 0) {
+      this.newline();
+    }
+
+    this._restoreState();
+
+    this._queue([
+      0x1b, 0x74, this._getCodepageIdentifier('cp437'),
+    ]);
+
+    this._queue([
+      new Array(options.marginLeft).fill(0x20),
+      elements[0],
+      new Array(options.width - 2).fill(elements[4]),
+      elements[1],
+      new Array(options.marginRight).fill(0x20),
+    ]);
+
+    this.newline();
+
+    const cell = [];
+
+    if (typeof contents === 'string') {
+      const w = linewrap(options.width - 2 - options.paddingLeft - options.paddingRight, {lineBreak: '\n'});
+      const fragments = w(contents).split('\n');
+
+      for (let f = 0; f < fragments.length; f++) {
+        if (options.align == 'right') {
+          cell[f] = this._encode(fragments[f].padStart(options.width - 2 - options.paddingLeft - options.paddingRight));
+        } else {
+          cell[f] = this._encode(fragments[f].padEnd(options.width - 2 - options.paddingLeft - options.paddingRight));
+        }
+      }
+    }
+
+    if (typeof contents === 'function') {
+      const columnEncoder = new EscPosEncoder(Object.assign({}, this._options, {
+        width: options.width - 2 - options.paddingLeft - options.paddingRight,
+        embedded: true,
+      }));
+
+      columnEncoder._codepage = this._codepage;
+      columnEncoder.align(options.align);
+      contents(columnEncoder);
+      const encoded = columnEncoder.encode();
+
+      let fragment = [];
+
+      for (let e = 0; e < encoded.byteLength; e++) {
+        if (e < encoded.byteLength - 1) {
+          if (encoded[e] === 0x0a && encoded[e + 1] === 0x0d) {
+            cell.push(fragment);
+            fragment = [];
+
+            e++;
+            continue;
+          }
+        }
+
+        fragment.push(encoded[e]);
+      }
+
+      if (fragment.length) {
+        cell.push(fragment);
+      }
+    }
+
+    for (let c = 0; c < cell.length; c++) {
+      this._queue([
+        new Array(options.marginLeft).fill(0x20),
+        elements[5],
+        new Array(options.paddingLeft).fill(0x20),
+      ]);
+
+      this._queue([
+        cell[c],
+      ]);
+
+      this._restoreState();
+
+      this._queue([
+        0x1b, 0x74, this._getCodepageIdentifier('cp437'),
+      ]);
+
+      this._queue([
+        new Array(options.paddingRight).fill(0x20),
+        elements[5],
+        new Array(options.marginRight).fill(0x20),
+      ]);
+
+      this.newline();
+    }
+
+    this._queue([
+      new Array(options.marginLeft).fill(0x20),
+      elements[2],
+      new Array(options.width - 2).fill(elements[4]),
+      elements[3],
+      new Array(options.marginRight).fill(0x20),
+    ]);
+
+    this._restoreState();
+
+    this.newline();
 
     return this;
   }
@@ -545,6 +948,10 @@ class EscPosEncoder {
      *
      */
   barcode(value, symbology, height) {
+    if (this._embedded) {
+      throw new Error('Barcodes are not supported in table cells or boxes');
+    }
+
     const symbologies = {
       'upca': 0x00,
       'upce': 0x01,
@@ -566,6 +973,10 @@ class EscPosEncoder {
 
     if (symbology in symbologies) {
       const bytes = CodepageEncoder.encode(value, 'ascii');
+
+      if (this._cursor != 0) {
+        this.newline();
+      }
 
       this._queue([
         0x1d, 0x68, height,
@@ -602,6 +1013,8 @@ class EscPosEncoder {
       throw new Error('Symbology not supported by printer');
     }
 
+    this._flush();
+
     return this;
   }
 
@@ -616,6 +1029,10 @@ class EscPosEncoder {
      *
      */
   qrcode(value, model, size, errorlevel) {
+    if (this._embedded) {
+      throw new Error('QR codes are not supported in table cells or boxes');
+    }
+
     /* Force printing the print buffer and moving to a new line */
 
     this._queue([
@@ -695,6 +1112,8 @@ class EscPosEncoder {
       0x1d, 0x28, 0x6b, 0x03, 0x00, 0x31, 0x51, 0x30,
     ]);
 
+    this._flush();
+
     return this;
   }
 
@@ -710,6 +1129,10 @@ class EscPosEncoder {
      *
      */
   image(element, width, height, algorithm, threshold) {
+    if (this._embedded) {
+      throw new Error('Images are not supported in table cells or boxes');
+    }
+
     if (width % 8 !== 0) {
       throw new Error('Width must be a multiple of 8');
     }
@@ -776,6 +1199,11 @@ class EscPosEncoder {
       return bytes;
     };
 
+
+    if (this._cursor != 0) {
+      this.newline();
+    }
+
     /* Encode images with ESC * */
 
     if (this._options.imageMode == 'column') {
@@ -808,6 +1236,8 @@ class EscPosEncoder {
       ]);
     }
 
+    this._flush();
+
     return this;
   }
 
@@ -819,6 +1249,10 @@ class EscPosEncoder {
      *
      */
   cut(value) {
+    if (this._embedded) {
+      throw new Error('Cut is not supported in table cells or boxes');
+    }
+
     let data = 0x00;
 
     if (value == 'partial') {
@@ -842,6 +1276,10 @@ class EscPosEncoder {
      *
      */
   pulse(device, on, off) {
+    if (this._embedded) {
+      throw new Error('Pulse is not supported in table cells or boxes');
+    }
+
     if (typeof device === 'undefined') {
       device = 0;
     }
@@ -884,6 +1322,8 @@ class EscPosEncoder {
      *
      */
   encode() {
+    this._flush();
+
     let length = 0;
 
     this._buffer.forEach((item) => {

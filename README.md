@@ -314,6 +314,51 @@ Also, you can combine this command with the width command to make the text bigge
         .height(1)
         .encode()
 
+
+### Table
+
+Insert a table with multiple columns. The contents of each cell can be a string, or a callback function.
+
+    let result = encoder
+        .table(
+            [
+                { width: 36, marginRight: 2, align: 'left' },
+                { width: 10, align: 'right' }
+            ], 
+            [
+                [ 'Item 1', '€ 10,00' ],
+                [ 'Item 2', '15,00' ],
+                [ 'Item 3', '9,95' ],
+                [ 'Item 4', '4,75' ],
+                [ 'Item 5', '211,05' ],
+                [ '', '='.repeat(10) ],
+                [ 'Total', (encoder) => encoder.bold().text('€ 250,75').bold() ],
+            ]
+        )	
+        .encode()
+
+
+### Box
+
+Insert a bordered box. The content of the box can be a string, or a callback function.
+
+    let result = encoder
+        .box(
+            { width: 30, align: 'right', style: 'double', marginLeft: 10 }, 
+            'The quick brown fox jumps over the lazy dog
+        )
+        .encode()
+
+
+### Rule
+
+Insert a horizontal rule.
+
+    let result = encoder
+        .rule({ style: 'double' })  
+        .encode()
+
+
 ### Barcode
 
 Print a barcode of a certain symbology. The first parameter is the value of the barcode as a string, the second is the symbology and finally the height of the barcode.
