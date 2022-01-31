@@ -611,20 +611,36 @@ class EscPosEncoder {
   /**
      * Change text size
      *
-     * @param  {string}          value   small or normal
+     * @param  {string}          value   small, normal, large, medium, medium-sm, medium-large, medium-med
      * @return {object}                  Return the object, for easy chaining commands
      *
      */
-  size(value) {
-    if (value === 'small') {
-      value = 0x01;
-    } else {
-      value = 0x00;
+   size(value) {
+    switch (value) {
+      case 'large':
+        value = [0x1b, 0x21, 0x30];
+        break;
+      case 'small':
+        value = [0x1b, 0x21, 0x01];
+        break;
+      case 'medium':
+        value = [0x1b, 0x21, 0x16];
+        break;
+      case 'medium-large':
+        value = [0x1b, 0x21, 0x22];
+        break;
+      case 'medium-sm':
+        value = [0x1b, 0x21, 0x04];
+        break;
+      case 'medium-med':
+        value = [0x1b, 0x21, 0x10];
+        break;
+      default:
+        value = [0x1b, 0x21, 0x00];
+        break;
     }
 
-    this._queue([
-      0x1b, 0x4d, value,
-    ]);
+    this._queue(value);
 
     return this;
   }
