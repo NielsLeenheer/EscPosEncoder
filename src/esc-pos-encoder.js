@@ -212,7 +212,7 @@ class EscPosEncoder {
     */
   _encode(value) {
     if (this._codepage != 'auto') {
-      return CodepageEncoder.encode(value, this._codepage);
+      return CodepageEncoder.encode(this._codepage, value);
     }
 
     let codepages;
@@ -972,7 +972,7 @@ class EscPosEncoder {
     };
 
     if (symbology in symbologies) {
-      const bytes = CodepageEncoder.encode(value, 'ascii');
+      const bytes = CodepageEncoder.encode('ascii', value);
 
       if (this._cursor != 0) {
         this.newline();
@@ -1099,7 +1099,7 @@ class EscPosEncoder {
 
     /* Data */
 
-    const bytes = CodepageEncoder.encode(value, 'iso88591');
+    const bytes = CodepageEncoder.encode('iso88591', value);
     const length = bytes.length + 3;
 
     this._queue([
