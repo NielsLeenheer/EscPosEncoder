@@ -1,6 +1,6 @@
 {
   "name": "esc-pos-encoder-latest",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "(Latest master branch) Create a set of commands that can be send to any receipt printer that supports ESC/POS",
   "main": "src/esc-pos-encoder.js",
   "scripts": {
@@ -30,15 +30,15 @@
   "devDependencies": {
     "browserify": "^17.0.0",
     "buffer-to-uint8array": "^1.1.0",
-    "chai": "^4.3.4",
-    "eslint": "^7.31.0",
+    "chai": "^4.3.7",
+    "eslint": "^7.32.0",
     "eslint-config-google": "^0.14.0",
     "iconv-lite": "^0.6.3",
-    "mocha": "^9.0.2",
+    "mocha": "^9.2.2",
     "uglify-es": "^3.3.9"
   },
   "dependencies": {
-    "canvas": "^2.8.0",
+    "canvas": "^2.11.0",
     "canvas-dither": "^1.0.1",
     "canvas-flatten": "^1.0.1",
     "codepage-encoder": "^1.0.0",
