@@ -272,6 +272,16 @@ Change the text size. You can specify the size using a parameter which can be ei
         .line('A line of small text')
         .size('normal')
         .line('A line of normal text')
+        .size('large')
+        .line('A line of large text')
+        .size('medium')
+        .line('A line of medium text')
+        .size('medium-sm')
+        .line('A line of medium-sm text')
+        .size('medium-large')
+        .line('A line of medium-large text')
+        .size('medium-med')
+        .line('A line of medium-med text')
         .encode()
 
 ### Width

@@ -1,7 +1,7 @@
 {
-  "name": "esc-pos-encoder",
+  "name": "esc-pos-encoder-latest",
   "version": "2.0.0",
-  "description": "Create a set of commands that can be send to any receipt printer that supports ESC/POS",
+  "description": "(Latest master branch) Create a set of commands that can be send to any receipt printer that supports ESC/POS",
   "main": "src/esc-pos-encoder.js",
   "scripts": {
     "bundle": "browserify src/esc-pos-encoder.js --standalone EscPosEncoder -o dist/esc-pos-encoder.js",
