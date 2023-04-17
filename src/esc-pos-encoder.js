@@ -342,8 +342,6 @@ class EscPosEncoder {
   }
 
 
-
-
   /**
      * Initialize the printer
      *
