@@ -343,7 +343,7 @@ class EscPosEncoder {
 
 
 
-  
+
   /**
      * Initialize the printer
      *
@@ -797,13 +797,13 @@ class EscPosEncoder {
   }
 
   /**
-     * Insert a horizontal rule
+     * Insert a box
      *
      * @param  {object}           options   And object with the following properties:
      *                                      - style: The style of the border, either single or double
-     *                                      - width: The width of the box, by default the width of the paper, if specified
-     *                                      - marginLeft: Space between the left border and the left side of the paper
-     *                                      - marginRight: Space between the right border and the right side of the paper
+     *                                      - width: The width of the box, by default the width of the paper
+     *                                      - marginLeft: Space between the left border and the left edge
+     *                                      - marginRight: Space between the right border and the right edge
      *                                      - paddingLeft: Space between the contents and the left border of the box
      *                                      - paddingRight: Space between the contents and the right border of the box
      * @param  {string|function}  contents  A string value, or a callback function.
