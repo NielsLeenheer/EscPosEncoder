@@ -41,7 +41,7 @@
     "canvas": "^2.8.0",
     "canvas-dither": "^1.0.1",
     "canvas-flatten": "^1.0.1",
-    "codepage-encoder": "^1.0.0",
+    "codepage-encoder": "^2.0.0",
     "linewrap": "^0.2.1"
   }
 }
