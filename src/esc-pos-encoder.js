@@ -116,6 +116,21 @@ const codepageMappings = {
     'cp858': 0x13,
   },
 
+  citizen: {
+    'cp437': 0x00,
+    'shiftjis': 0x01,
+    'cp850': 0x02,
+    'cp860': 0x03,
+    'cp863': 0x04,
+    'cp865': 0x05,
+    'cp852': 0x12,
+    'cp866': 0x11,
+    'cp857': 0x08,
+    'windows1252': 0x10,
+    'cp858': 0x13,
+    'cp864': 0x28,
+  },
+
   legacy: {
     'cp437': 0x00,
     'cp737': 0x40,
