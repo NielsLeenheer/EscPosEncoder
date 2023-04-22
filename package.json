@@ -12,6 +12,8 @@
     "import": "./dist/esc-pos-encoder.mjs",
     "require": "./dist/esc-pos-encoder.cjs"
   },
+  "main": "dist/esc-pos-encoder.cjs",
+  "module": "dist/esc-pos-encoder.mjs",
   "scripts": {
     "build": "rollup -c",
     "lint": "eslint --fix src/esc-pos-encoder.js",
