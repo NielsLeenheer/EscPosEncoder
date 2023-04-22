@@ -6,12 +6,11 @@
   "exports": {
     "browser": {
       "import": "./dist/esc-pos-encoder.esm.js",
-      "require": "./dist/esc-pos-encoder.umd.js"
+      "require": "./dist/esc-pos-encoder.umd.js",
+      "script": "./dist/esc-pos-encoder.umd.js"
     },
-    "default": {
-      "import": "./dist/esc-pos-encoder.mjs",
-      "require": "./dist/esc-pos-encoder.cjs"
-    }
+    "import": "./dist/esc-pos-encoder.mjs",
+    "require": "./dist/esc-pos-encoder.cjs"
   },
   "scripts": {
     "build": "rollup -c",
