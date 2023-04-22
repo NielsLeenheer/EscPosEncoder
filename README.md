@@ -6,30 +6,17 @@ Before you use this library, you should also consider [ThermalPrinterEncoder](ht
 
 ## Usage
 
-In the browser you can load the `esc-pos-encoder.js` file located in the `dist` folder and instantiate a `EscPosEncoder` object. 
+This package is compatible with browsers and Node. It provides bundled versions for direct use in the browser and can also be used as an input for your own bundler. And of course there are ES6 modules and CommonJS versions for use in Node.
 
-    <script src='dist/esc-pos-encoder.js></script>
+### Direct use in the browser
 
-    <script>
+The `dist` folder contains a UMD bundle that can be loaded using RequireJS or simply using a `<script>` tag. Alternatively there is a bundled ES6 module that can be imported.
 
-        let encoder = new EscPosEncoder();
+For example: 
 
-        let result = encoder
-            .initialize()
-            .text('The quick brown fox jumps over the lazy dog')
-            .newline()
-            .qrcode('https://nielsleenheer.com')
-            .encode();
+In the browser you can import `EscPosEncoder` from the `esc-pos-encoder.esm.js` file located in the `dist` folder.
 
-    </script>
-
-If you want to use this libary from Node, first install the package using npm:
-
-    npm install esc-pos-encoder --save
-
-Then, require the package and use it like so:
-
-    let EscPosEncoder = require('esc-pos-encoder');
+    import EscPosEncoder from 'esc-pos-encoder.esm.js';
 
     let encoder = new EscPosEncoder();
 
@@ -39,6 +26,48 @@ Then, require the package and use it like so:
         .newline()
         .qrcode('https://nielsleenheer.com')
         .encode();
+
+
+Alternatively you can load the `esc-pos-encoder.umd.js` file located in the `dist` folder and instantiate a `EscPosEncoder` object. 
+
+    <script src='dist/esc-pos-encoder.umd.js'></script>
+
+    <script>
+
+        let encoder = new EscPosEncoder();
+
+    </script>
+
+Or if you prefer a loader like RequireJS, you could use this:
+
+    requirejs([ 'dist/esc-pos-encoder.umd' ], EscPosEncoder => {
+        let encoder = new EscPosEncoder();
+    });
+
+### Using with Node (or in the browser, if you use your own bundler)
+
+If you want to use this libary, first install the package using npm:
+
+    npm install esc-pos-encoder --save
+
+If you prefer ES6 modules, then import `EscPosEncoder` from `esc-pos-encoder` and use it like so:
+
+    import EscPosEncoder from 'esc-pos-encoder';
+
+    let encoder = new EscPosEncoder();
+
+    let result = encoder
+        .initialize()
+        .text('The quick brown fox jumps over the lazy dog')
+        .newline()
+        .qrcode('https://nielsleenheer.com')
+        .encode();
+
+Alternatively you could use the CommonJS way of doing things and require the package:
+
+    let EscPosEncoder = require('esc-pos-encoder');
+
+    let encoder = new EscPosEncoder();
 
 
 ## Options

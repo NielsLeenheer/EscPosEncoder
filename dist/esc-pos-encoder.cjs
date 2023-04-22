@@ -1,8 +1,10 @@
-import linewrap from 'linewrap';
-import {createCanvas} from 'canvas';
-import Dither from 'canvas-dither';
-import Flatten from 'canvas-flatten';
-import CodepageEncoder from 'codepage-encoder';
+'use strict';
+
+var linewrap = require('linewrap');
+var canvas = require('canvas');
+var Dither = require('canvas-dither');
+var Flatten = require('canvas-flatten');
+var CodepageEncoder = require('codepage-encoder');
 
 const codepageMappings = {
   epson: {
@@ -1161,8 +1163,8 @@ class EscPosEncoder {
       threshold = 128;
     }
 
-    const canvas = createCanvas(width, height);
-    const context = canvas.getContext('2d');
+    const canvas$1 = canvas.createCanvas(width, height);
+    const context = canvas$1.getContext('2d');
     context.drawImage(element, 0, 0, width, height);
     let image = context.getImageData(0, 0, width, height);
 
@@ -1366,4 +1368,4 @@ class EscPosEncoder {
   }
 }
 
-export default EscPosEncoder;
+module.exports = EscPosEncoder;

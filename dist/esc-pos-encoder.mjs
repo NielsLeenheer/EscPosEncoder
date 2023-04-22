@@ -1,5 +1,5 @@
 import linewrap from 'linewrap';
-import {createCanvas} from 'canvas';
+import { createCanvas } from 'canvas';
 import Dither from 'canvas-dither';
 import Flatten from 'canvas-flatten';
 import CodepageEncoder from 'codepage-encoder';
@@ -1366,4 +1366,4 @@ class EscPosEncoder {
   }
 }
 
-export default EscPosEncoder;
+export { EscPosEncoder as default };
