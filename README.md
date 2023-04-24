@@ -1,4 +1,4 @@
-# esc-pos-encoder
+# EscPosEncoder
 
 Create a set of commands that can be send to any receipt printer that supports ESC/POS.
 
