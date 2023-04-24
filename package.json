@@ -8,9 +8,7 @@
       "import": "./dist/esc-pos-encoder.esm.js",
       "require": "./dist/esc-pos-encoder.umd.js",
       "script": "./dist/esc-pos-encoder.umd.js"
-    },
-    "import": "./dist/esc-pos-encoder.mjs",
-    "require": "./dist/esc-pos-encoder.cjs"
+    }
   },
   "main": "dist/esc-pos-encoder.cjs",
   "module": "dist/esc-pos-encoder.mjs",
