@@ -1,6 +1,6 @@
 {
   "name": "esc-pos-encoder",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Create a set of commands that can be send to any receipt printer that supports ESC/POS",
   "type": "module",
   "exports": {
@@ -8,7 +8,9 @@
       "import": "./dist/esc-pos-encoder.esm.js",
       "require": "./dist/esc-pos-encoder.umd.js",
       "script": "./dist/esc-pos-encoder.umd.js"
-    }
+    },
+    "import": "./dist/esc-pos-encoder.mjs",
+    "require": "./dist/esc-pos-encoder.cjs"
   },
   "main": "dist/esc-pos-encoder.cjs",
   "module": "dist/esc-pos-encoder.mjs",
@@ -48,7 +50,7 @@
     "canvas": "^2.11.2",
     "canvas-dither": "^1.0.1",
     "canvas-flatten": "^1.0.1",
-    "codepage-encoder": "^2.0.2",
+    "codepage-encoder": "^2.0.4",
     "linewrap": "^0.2.1"
   },
   "files": [
