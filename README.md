@@ -1,4 +1,4 @@
-# esc-pos-encoder
+# EscPosEncoder
 
 Create a set of commands that can be send to any receipt printer that supports ESC/POS.
 
@@ -6,13 +6,17 @@ Before you use this library, you should also consider [ThermalPrinterEncoder](ht
 
 ## Usage
 
-First, install the package using npm:
+This package is compatible with browsers and Node. It provides bundled versions for direct use in the browser and can also be used as an input for your own bundler. And of course there are ES6 modules and CommonJS versions for use in Node.
 
-    npm install esc-pos-encoder --save
+### Direct use in the browser
 
-Then, require the package and use it like so:
+The `dist` folder contains a UMD bundle that can be loaded using RequireJS or simply using a `<script>` tag. Alternatively there is a bundled ES6 module that can be imported.
 
-    let EscPosEncoder = require('esc-pos-encoder');
+For example: 
+
+In the browser you can import `EscPosEncoder` from the `esc-pos-encoder.esm.js` file located in the `dist` folder.
+
+    import EscPosEncoder from 'esc-pos-encoder.esm.js';
 
     let encoder = new EscPosEncoder();
 
@@ -22,6 +26,77 @@ Then, require the package and use it like so:
         .newline()
         .qrcode('https://nielsleenheer.com')
         .encode();
+
+
+Alternatively you can load the `esc-pos-encoder.umd.js` file located in the `dist` folder and instantiate a `EscPosEncoder` object. 
+
+    <script src='dist/esc-pos-encoder.umd.js'></script>
+
+    <script>
+
+        let encoder = new EscPosEncoder();
+
+    </script>
+
+Or if you prefer a loader like RequireJS, you could use this:
+
+    requirejs([ 'dist/esc-pos-encoder.umd' ], EscPosEncoder => {
+        let encoder = new EscPosEncoder();
+    });
+
+### Using with Node (or in the browser, if you use your own bundler)
+
+If you want to use this libary, first install the package using npm:
+
+    npm install esc-pos-encoder --save
+
+If you prefer ES6 modules, then import `EscPosEncoder` from `esc-pos-encoder` and use it like so:
+
+    import EscPosEncoder from 'esc-pos-encoder';
+
+    let encoder = new EscPosEncoder();
+
+    let result = encoder
+        .initialize()
+        .text('The quick brown fox jumps over the lazy dog')
+        .newline()
+        .qrcode('https://nielsleenheer.com')
+        .encode();
+
+Alternatively you could use the CommonJS way of doing things and require the package:
+
+    let EscPosEncoder = require('esc-pos-encoder');
+
+    let encoder = new EscPosEncoder();
+
+
+## Options
+
+When you create the `EscPosEncoder` object you can specify a number of options to help with the library with generating receipts. 
+
+### Width
+
+To set the width of the paper you can use the `width` property. This is option, as text automatically wraps to a new line if the edge of the paper is reached, but if you want to use word wrap, you need to specify this.
+
+    let encoder = new EscPosEncoder({
+        width:    42
+    });
+
+If you use 57mm wide paper, it allows you to print up to 32 or 35 characters horizontally, depending on the resolution of the printer.
+
+If you use 80mm wide paper, it allows you to print up to 42 or 48 characters horizontally, depending on the resolution of the printer.
+
+
+## Word wrap
+
+If you want text to automatically word wrap at the edge of the paper you can turn on `wordWrap`. If you use this option you also must specify a paper width using the `width` property.
+
+    let encoder = new EscPosEncoder({
+        width:      48,
+        wordWrap:   true
+    });
+
+
 
 ## Commands
 
@@ -120,6 +195,7 @@ By default the library only considers some of the most common code pages when de
             'cp852', 'cp857', 'cp855', 'cp866', 'cp869',
         ]
     });
+
 
 
 ### Text
@@ -318,12 +394,11 @@ Also, you can combine this command with the width command to make the text bigge
 
     let result = encoder
         .width(2)
-        .width(2)
+        .height(2)
         .line('This text is twice as large as normal text')
-        .height(1)
+        .width(1)
         .height(1)
         .encode()
-
 
 ### Table
 
@@ -347,10 +422,57 @@ Insert a table with multiple columns. The contents of each cell can be a string,
         )	
         .encode()
 
+The table function takes two parameters. 
+
+The first parameter is an array of column definitions. Each column can have the folowing properties:
+
+- `width`:  determines the width of the column. 
+- `marginLeft` and `marginRight`: set a margin to the left and right of the column. 
+- `align`: sets the horizontal alignment of the text in the column and can either be `left` or `right`.
+- `verticalAlign`: sets the vertical alignment of the text in the column and can either be `top` or `bottom`.
+
+The second parameter contains the data and is an array that contains each row. There can be as many rows as you would like.
+
+Each row is an array with a value for each cell. The number of cells in each row should be equal to the number of columns you defined previously.
+
+    [
+        /* Row one, with two columns */
+        [ 'Cell one', 'Cell two' ],
+
+        /* Row two, with two columns */
+        [ 'Cell three', 'Cell four' ]
+    ]
+
+The value can either be a string or a callback function. 
+
+If you want to style text inside of a cell, can use the callback function instead. The first parameter of the called function contains the encoder object which you can use to chain additional commands.
+
+    [
+        /* Row one, with two columns */
+        [ 
+            'Cell one',
+            (encoder) => encoder.bold().text('Cell two').bold()
+        ],
+    ]
+
 
 ### Box
 
-Insert a bordered box. The content of the box can be a string, or a callback function.
+Insert a bordered box. 
+
+The first parameter is an object with additional configuration options.
+
+- `style`: The style of the border, either `single` or `double`
+- `width`: The width of the box, by default the width of the paper
+- `marginLeft`: Space between the left border and the left edge
+- `marginRight`: Space between the right border and the right edge
+- `paddingLeft`: Space between the contents and the left border of the box
+- `paddingRight`: Space between the contents and the right border of the box
+- `align`: The alignment of the text within the box, can be `left` or `right`.
+
+The second parameter is the content of the box and it can be a string, or a callback function.
+
+For example:
 
     let result = encoder
         .box(
@@ -364,10 +486,16 @@ Insert a bordered box. The content of the box can be a string, or a callback fun
 
 Insert a horizontal rule.
 
+The first parameters is an object with additional styling options:
+
+- `style`: The style of the line, either `single` or `double`
+- `width`: The width of the line, by default the width of the paper
+
+For example:
+
     let result = encoder
         .rule({ style: 'double' })  
         .encode()
-
 
 ### Barcode
 
@@ -500,7 +628,7 @@ Cut the paper. Optionally a parameter can be specified which can be either be "p
         .cut('partial')
         .encode()
 
-Note: Not all printer models support cutting paper. And even if they do, they might not support both types of cuts.
+_Note: Not all printer models support cutting paper. And even if they do, they might not support both types of cuts._
 
 ### Pulse
 

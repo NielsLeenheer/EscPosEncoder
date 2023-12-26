@@ -1,10 +1,6 @@
-const EscPosEncoder = require ('../src/esc-pos-encoder');
-const { createCanvas } = require('canvas');
-
-const chai = require('chai');  
-const assert = chai.assert;
-const expect = chai.expect;
-const should = chai.should();
+import EscPosEncoder from '../src/esc-pos-encoder.js';
+import { createCanvas } from 'canvas';
+import { assert, expect } from 'chai';
 
 
 describe('EscPosEncoder', function() {
@@ -257,7 +253,7 @@ describe('EscPosEncoder', function() {
         let result = encoder.cut().encode();
         
         it('should be [ 29, 86, 00 ]', function () {
-            assert.deepEqual(new Uint8Array([ 29, 86, 00 ]), result);
+            assert.deepEqual(new Uint8Array([ 29, 86, 0 ]), result);
         });
     });
 
@@ -265,7 +261,7 @@ describe('EscPosEncoder', function() {
         let result = encoder.cut('full').encode();
         
         it('should be [ 29, 86, 00 ]', function () {
-            assert.deepEqual(new Uint8Array([ 29, 86, 00 ]), result);
+            assert.deepEqual(new Uint8Array([ 29, 86, 0 ]), result);
         });
     });
 
@@ -273,7 +269,7 @@ describe('EscPosEncoder', function() {
         let result = encoder.cut('partial').encode();
         
         it('should be [ 29, 86, 01 ]', function () {
-            assert.deepEqual(new Uint8Array([ 29, 86, 01 ]), result);
+            assert.deepEqual(new Uint8Array([ 29, 86, 1 ]), result);
         });
     });
 

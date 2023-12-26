@@ -1,8 +1,10 @@
-import linewrap from 'linewrap';
-import {createCanvas} from 'canvas';
-import Dither from 'canvas-dither';
-import Flatten from 'canvas-flatten';
-import CodepageEncoder from 'codepage-encoder';
+'use strict';
+
+var linewrap = require('linewrap');
+var canvas = require('canvas');
+var Dither = require('canvas-dither');
+var Flatten = require('canvas-flatten');
+var CodepageEncoder = require('codepage-encoder');
 
 const codepageMappings = {
   epson: {
@@ -226,7 +228,7 @@ class EscPosEncoder {
     */
   _encode(value) {
     if (this._codepage != 'auto') {
-      return CodepageEncoder.encode(this._codepage, value);
+      return CodepageEncoder.encode(value, this._codepage);
     }
 
     let codepages;
@@ -623,36 +625,20 @@ class EscPosEncoder {
   /**
      * Change text size
      *
-     * @param  {string}          value   small, normal, large, medium, medium-sm, medium-large, medium-med
+     * @param  {string}          value   small or normal
      * @return {object}                  Return the object, for easy chaining commands
      *
      */
   size(value) {
-    switch (value) {
-      case 'large':
-        value = [0x1b, 0x21, 0x30];
-        break;
-      case 'small':
-        value = [0x1b, 0x21, 0x01];
-        break;
-      case 'medium':
-        value = [0x1b, 0x21, 0x16];
-        break;
-      case 'medium-large':
-        value = [0x1b, 0x21, 0x22];
-        break;
-      case 'medium-sm':
-        value = [0x1b, 0x21, 0x04];
-        break;
-      case 'medium-med':
-        value = [0x1b, 0x21, 0x10];
-        break;
-      default:
-        value = [0x1b, 0x21, 0x00];
-        break;
+    if (value === 'small') {
+      value = 0x01;
+    } else {
+      value = 0x00;
     }
 
-    this._queue(value);
+    this._queue([
+      0x1b, 0x4d, value,
+    ]);
 
     return this;
   }
@@ -1000,7 +986,7 @@ class EscPosEncoder {
     };
 
     if (symbology in symbologies) {
-      const bytes = CodepageEncoder.encode('ascii', value);
+      const bytes = CodepageEncoder.encode(value, 'ascii');
 
       if (this._cursor != 0) {
         this.newline();
@@ -1127,7 +1113,7 @@ class EscPosEncoder {
 
     /* Data */
 
-    const bytes = CodepageEncoder.encode('iso88591', value);
+    const bytes = CodepageEncoder.encode(value, 'iso88591');
     const length = bytes.length + 3;
 
     this._queue([
@@ -1177,8 +1163,8 @@ class EscPosEncoder {
       threshold = 128;
     }
 
-    const canvas = createCanvas(width, height);
-    const context = canvas.getContext('2d');
+    const canvas$1 = canvas.createCanvas(width, height);
+    const context = canvas$1.getContext('2d');
     context.drawImage(element, 0, 0, width, height);
     let image = context.getImageData(0, 0, width, height);
 
@@ -1382,4 +1368,4 @@ class EscPosEncoder {
   }
 }
 
-export default EscPosEncoder;
+module.exports = EscPosEncoder;
