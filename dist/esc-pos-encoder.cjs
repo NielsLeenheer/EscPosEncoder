@@ -228,7 +228,7 @@ class EscPosEncoder {
     */
   _encode(value) {
     if (this._codepage != 'auto') {
-      return CodepageEncoder.encode(value, this._codepage);
+      return CodepageEncoder.encode(this._codepage, value);
     }
 
     let codepages;
@@ -625,20 +625,36 @@ class EscPosEncoder {
   /**
      * Change text size
      *
-     * @param  {string}          value   small or normal
+     * @param  {string}          value   small, normal, large, medium, medium-sm, medium-large, medium-med
      * @return {object}                  Return the object, for easy chaining commands
      *
      */
   size(value) {
-    if (value === 'small') {
-      value = 0x01;
-    } else {
-      value = 0x00;
+    switch (value) {
+      case 'large':
+        value = [0x1b, 0x21, 0x30];
+        break;
+      case 'small':
+        value = [0x1b, 0x21, 0x01];
+        break;
+      case 'medium':
+        value = [0x1b, 0x21, 0x16];
+        break;
+      case 'medium-large':
+        value = [0x1b, 0x21, 0x22];
+        break;
+      case 'medium-sm':
+        value = [0x1b, 0x21, 0x04];
+        break;
+      case 'medium-med':
+        value = [0x1b, 0x21, 0x10];
+        break;
+      default:
+        value = [0x1b, 0x21, 0x00];
+        break;
     }
 
-    this._queue([
-      0x1b, 0x4d, value,
-    ]);
+    this._queue(value);
 
     return this;
   }
@@ -986,7 +1002,7 @@ class EscPosEncoder {
     };
 
     if (symbology in symbologies) {
-      const bytes = CodepageEncoder.encode(value, 'ascii');
+      const bytes = CodepageEncoder.encode('ascii', value);
 
       if (this._cursor != 0) {
         this.newline();
@@ -1113,7 +1129,7 @@ class EscPosEncoder {
 
     /* Data */
 
-    const bytes = CodepageEncoder.encode(value, 'iso88591');
+    const bytes = CodepageEncoder.encode('iso88591', value);
     const length = bytes.length + 3;
 
     this._queue([
