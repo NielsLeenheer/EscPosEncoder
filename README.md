@@ -144,7 +144,7 @@ For some languages it might even be better to print text as an image, because re
 #### Code page mappings
 
 By default this library uses the Epson code page mappings and Epson printers will support most of the code pages out of the box. However, other manufacturers might support the same code pages, but use a different mapping. That means that even though
-the printer supports the code page, the way to activate it is different for that printer. This library does support a number of code page mappings for other manufacturers, such as `bixolon`, `zjiang` and `star` (in ESC/POS emulation mode).
+the printer supports the code page, the way to activate it is different for that printer. This library does support a number of code page mappings for other manufacturers, such as `bixolon`, `citizen`, `xprinter`, `zjiang` and `star` (in ESC/POS emulation mode).
 
 You can activate these alternative mappings with a parameter when the library is instantiated:
 
