@@ -153,7 +153,7 @@ const codepageMappings = {
     'cp1252': 0x10,
     'iso88596': 0x16,
     'shiftjis': 0xfc,
-    'windows874': 0x1e,
+    'cp874': 0x1e,
     'windows1250': 0x48,
     'windows1251': 0x49,
     'windows1252': 0x47,
