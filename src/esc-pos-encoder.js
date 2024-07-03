@@ -219,15 +219,6 @@ class EscPosEncoder {
      * @param  {object}   options   Object containing configuration options
     */
   constructor(options) {
-    this._reset(options);
-  }
-
-  /**
-     * Reset the state of the object
-     *
-     * @param  {object}   options   Object containing configuration options
-    */
-  _reset(options) {
     this._options = Object.assign({
       width: null,
       embedded: false,
@@ -240,6 +231,13 @@ class EscPosEncoder {
       ],
     }, options);
 
+    this._reset();
+  }
+
+  /**
+     * Reset the state of the object
+    */
+  _reset() {
     this._embedded = this._options.width && this._options.embedded;
 
     this._buffer = [];
