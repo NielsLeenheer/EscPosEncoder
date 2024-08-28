@@ -4,210 +4,7 @@ import Dither from 'canvas-dither';
 import Flatten from 'canvas-flatten';
 import CodepageEncoder from 'codepage-encoder';
 
-const codepageMappings = {
-  epson: {
-    'cp437': 0x00,
-    'shiftjis': 0x01,
-    'cp850': 0x02,
-    'cp860': 0x03,
-    'cp863': 0x04,
-    'cp865': 0x05,
-    'cp851': 0x0b,
-    'cp853': 0x0c,
-    'cp857': 0x0d,
-    'cp737': 0x0e,
-    'iso88597': 0x0f,
-    'windows1252': 0x10,
-    'cp866': 0x11,
-    'cp852': 0x12,
-    'cp858': 0x13,
-    'cp720': 0x20,
-    'cp775': 0x21,
-    'cp855': 0x22,
-    'cp861': 0x23,
-    'cp862': 0x24,
-    'cp864': 0x25,
-    'cp869': 0x26,
-    'iso88592': 0x27,
-    'iso885915': 0x28,
-    'cp1098': 0x29,
-    'cp1118': 0x2a,
-    'cp1119': 0x2b,
-    'cp1125': 0x2c,
-    'windows1250': 0x2d,
-    'windows1251': 0x2e,
-    'windows1253': 0x2f,
-    'windows1254': 0x30,
-    'windows1255': 0x31,
-    'windows1256': 0x32,
-    'windows1257': 0x33,
-    'windows1258': 0x34,
-    'rk1048': 0x35,
-  },
-
-  zjiang: {
-    'cp437': 0x00,
-    'shiftjis': 0x01,
-    'cp850': 0x02,
-    'cp860': 0x03,
-    'cp863': 0x04,
-    'cp865': 0x05,
-    'windows1252': 0x10,
-    'cp866': 0x11,
-    'cp852': 0x12,
-    'cp858': 0x13,
-    'windows1255': 0x20,
-    'cp861': 0x38,
-    'cp855': 0x3c,
-    'cp857': 0x3d,
-    'cp862': 0x3e,
-    'cp864': 0x3f,
-    'cp737': 0x40,
-    'cp851': 0x41,
-    'cp869': 0x42,
-    'cp1119': 0x44,
-    'cp1118': 0x45,
-    'windows1250': 0x48,
-    'windows1251': 0x49,
-    'cp3840': 0x4a,
-    'cp3843': 0x4c,
-    'cp3844': 0x4d,
-    'cp3845': 0x4e,
-    'cp3846': 0x4f,
-    'cp3847': 0x50,
-    'cp3848': 0x51,
-    'cp2001': 0x53,
-    'cp3001': 0x54,
-    'cp3002': 0x55,
-    'cp3011': 0x56,
-    'cp3012': 0x57,
-    'cp3021': 0x58,
-    'cp3041': 0x59,
-    'windows1253': 0x5a,
-    'windows1254': 0x5b,
-    'windows1256': 0x5c,
-    'cp720': 0x5d,
-    'windows1258': 0x5e,
-    'cp775': 0x5f,
-  },
-
-  bixolon: {
-    'cp437': 0x00,
-    'shiftjis': 0x01,
-    'cp850': 0x02,
-    'cp860': 0x03,
-    'cp863': 0x04,
-    'cp865': 0x05,
-    'cp851': 0x0b,
-    'cp858': 0x13,
-  },
-
-  star: {
-    'cp437': 0x00,
-    'shiftjis': 0x01,
-    'cp850': 0x02,
-    'cp860': 0x03,
-    'cp863': 0x04,
-    'cp865': 0x05,
-    'windows1252': 0x10,
-    'cp866': 0x11,
-    'cp852': 0x12,
-    'cp858': 0x13,
-  },
-
-  citizen: {
-    'cp437': 0x00,
-    'shiftjis': 0x01,
-    'cp850': 0x02,
-    'cp860': 0x03,
-    'cp863': 0x04,
-    'cp865': 0x05,
-    'cp852': 0x12,
-    'cp866': 0x11,
-    'cp857': 0x08,
-    'windows1252': 0x10,
-    'cp858': 0x13,
-    'cp864': 0x28,
-  },
-
-  xprinter: {
-    'cp437': 0x00,
-    'shiftjis': 0x01,
-    'cp850': 0x02,
-    'cp860': 0x03,
-    'cp863': 0x04,
-    'cp865': 0x05,
-    'windows1252': 0x10,
-    'cp866': 0x11,
-    'cp852': 0x12,
-    'cp858': 0x13,
-    'windows1257': 0x19,
-    'cp864': 0x1c,
-    'windows1255': 0x20,
-    'windows1256': 0x21,
-    'cp861': 0x38,
-    'cp855': 0x3c,
-    'cp857': 0x3d,
-    'cp862': 0x3e,
-    'cp737': 0x40,
-    'cp851': 0x41,
-    'cp869': 0x42,
-    'cp874': 0x46,
-    'windows1250': 0x48,
-    'windows1251': 0x49,
-    'cp3840': 0x4a,
-    'cp3841': 0x4b,
-    'cp3843': 0x4c,
-    'cp3844': 0x4d,
-    'cp3845': 0x4e,
-    'cp3846': 0x4f,
-    'cp3847': 0x50,
-    'cp3848': 0x51,
-    'cp2001': 0x53,
-    'cp3001': 0x54,
-    'cp3002': 0x55,
-    'cp3011': 0x56,
-    'cp3012': 0x57,
-    'cp3021': 0x58,
-    'cp3041': 0x59,
-  },
-
-  legacy: {
-    'cp437': 0x00,
-    'cp737': 0x40,
-    'cp850': 0x02,
-    'cp775': 0x5f,
-    'cp852': 0x12,
-    'cp855': 0x3c,
-    'cp857': 0x3d,
-    'cp858': 0x13,
-    'cp860': 0x03,
-    'cp861': 0x38,
-    'cp862': 0x3e,
-    'cp863': 0x04,
-    'cp864': 0x1c,
-    'cp865': 0x05,
-    'cp866': 0x11,
-    'cp869': 0x42,
-    'cp936': 0xff,
-    'cp949': 0xfd,
-    'cp950': 0xfe,
-    'cp1252': 0x10,
-    'iso88596': 0x16,
-    'shiftjis': 0xfc,
-    'cp874': 0x1e,
-    'windows1250': 0x48,
-    'windows1251': 0x49,
-    'windows1252': 0x47,
-    'windows1253': 0x5a,
-    'windows1254': 0x5b,
-    'windows1255': 0x20,
-    'windows1256': 0x5c,
-    'windows1257': 0x19,
-    'windows1258': 0x5e,
-  },
-};
-
+import codepageMappings from '../generated/mapping.js';
 
 /**
  * Create a byte stream based on commands for ESC/POS printers
@@ -276,7 +73,9 @@ class EscPosEncoder {
     let codepages;
 
     if (typeof this._options.codepageMapping == 'string') {
-      codepages = codepageMappings[this._options.codepageMapping];
+      codepages = Object.fromEntries(codepageMappings[this._options.codepageMapping]
+          .map((v, i) => [v, i])
+          .filter((i) => i));
     } else {
       codepages = this._options.codepageMapping;
     }
@@ -391,7 +190,9 @@ class EscPosEncoder {
     let codepages;
 
     if (typeof this._options.codepageMapping == 'string') {
-      codepages = codepageMappings[this._options.codepageMapping];
+      codepages = Object.fromEntries(codepageMappings[this._options.codepageMapping]
+          .map((v, i) => [v, i])
+          .filter((i) => i));
     } else {
       codepages = this._options.codepageMapping;
     }
@@ -436,7 +237,9 @@ class EscPosEncoder {
     let codepages;
 
     if (typeof this._options.codepageMapping == 'string') {
-      codepages = codepageMappings[this._options.codepageMapping];
+      codepages = Object.fromEntries(codepageMappings[this._options.codepageMapping]
+          .map((v, i) => [v, i])
+          .filter((i) => i));
     } else {
       codepages = this._options.codepageMapping;
     }

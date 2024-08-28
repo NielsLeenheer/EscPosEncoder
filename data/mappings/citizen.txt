@@ -1,0 +1,23 @@
+	0x00	cp437
+	0x01	epson/katakana
+	0x02	cp858
+	0x03	cp860
+	0x04	cp863
+	0x05	cp865
+	0x06	cp852
+	0x07	cp866
+	0x08	cp857
+#	0x09	windows1252     # Duplicate
+	0x10	windows1252
+#	0x11	cp866           # Duplicate
+#	0x12	cp852           # Duplicate
+#	0x13	cp858           # Duplicate
+#	0x14	thai11			# Rendering errors ltr/rtl?
+	0x15	thai11
+#	0x19	thai13			# Rendering errors ltr/rtl?
+	0x1a	thai13
+	0x1e	tcvn3
+	0x1f	tcvn3capitals
+	0x20	windows1258
+	0x28	cp864
+#	0x34	windows1258     # Duplicate
