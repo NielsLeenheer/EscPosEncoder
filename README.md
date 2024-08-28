@@ -6,7 +6,7 @@ Before you use this library, you should also consider [ThermalPrinterEncoder](ht
 
 ## Usage
 
-This package is compatible with browsers and Node. It provides bundled versions for direct use in the browser and can also be used as an input for your own bundler. And of course there are ES6 modules and CommonJS versions for use in Node.
+This package is compatible with browsers, Node and Deno. It provides bundled versions for direct use in the browser and can also be used as an input for your own bundler. And of course there are ES6 modules and CommonJS versions for use in Node.
 
 ### Direct use in the browser
 
@@ -66,6 +66,14 @@ If you prefer ES6 modules, then import `EscPosEncoder` from `esc-pos-encoder` an
 Alternatively you could use the CommonJS way of doing things and require the package:
 
     let EscPosEncoder = require('esc-pos-encoder');
+
+    let encoder = new EscPosEncoder();
+
+### Use with Deno
+
+This library does not have a dedicated package on `deno.land/x`, but you can directly import the NPM package. It is fully compatible with Deno.
+
+    import EscPosEncoder from 'npm:esc-pos-encoder';
 
     let encoder = new EscPosEncoder();
 
