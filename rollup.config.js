@@ -10,6 +10,7 @@ export default [
 		output: {
 			name: 'EscPosEncoder',
 			file: 'dist/esc-pos-encoder.umd.js',
+			sourcemap: true,
 			format: 'umd'
 		},
 		plugins: [
@@ -24,6 +25,7 @@ export default [
 		input: 'src/esc-pos-encoder.js',
 		output: { 
 			file: 'dist/esc-pos-encoder.esm.js', 
+			sourcemap: true,
 			format: 'es' 
 		},
 		plugins: [
