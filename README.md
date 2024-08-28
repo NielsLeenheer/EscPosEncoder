@@ -579,24 +579,69 @@ For example:
 
 Print an image. The image is automatically converted to black and white and can optionally be dithered using different algorithms.
 
-The first parameter is the image itself. When running in the browser it can be any element that can be drawn onto a canvas, like an img, svg, canvas and video elements. When on Node it can be a Canvas provided by the `canvas` package. 
+The first parameter is the image itself. When running in the browser it can be any element that can be drawn onto a canvas, like an img, svg, canvas and video element. 
 
-The second parameter is the width of the image on the paper receipt in pixels. It must be a multiple of 8.
+When using Node you have multiple options:
 
-The third parameter is the height of the image on the paper receipt in pixels. It must be a multiple of 8.
+- First of all, you can provide a `ImageData` object, which many libraries can export, such as `@canvas/image`, `canvas` and `image-pixels`.  
+
+- You can also provide raw pixel data provided by other common libraries, such as `readimage`, `sharp` and `get-pixels`.
+
+- And finally you can provide a `Canvas` or `Image` object used by the `canvas` library, but in that case you need to provide a `createCanvas` function when instantiating the encoder (In previous versions you did not need to do this, because the `canvas` library was a dependency, but in recent versions this has become an optional dependency).
+
+The second parameter is the width of the image on the paper receipt in pixels. It must be a multiple of 8. The provided image will be resized to the width specified here. 
+
+The third parameter is the height of the image on the paper receipt in pixels. It must be a multiple of 8. The provided image will be resized to the height specified here. 
 
 The fourth parameter is the dithering algorithm that is used to turn colour and grayscale images into black and white. The follow algorithms are supported: threshold, bayer, floydsteinberg, atkinson. If not supplied, it will default to a simple threshold.
 
 The fifth paramter is the threshold that will be used by the threshold and bayer dithering algorithm. It is ignored by the other algorithms. It is set to a default of 128.
+
+For example on the web:
+
+    let encoder = new EscPosEncoder();
 
     let img = new Image();
     img.src = 'https://...';
     
     img.onload = function() {
         let result = encoder
-            .image(img, 320, 320, 'atkinson')
+            .image(img, 64, 64, 'atkinson')
             .encode()
     }
+
+
+Or in Node using `sharp`:
+
+    import sharp from "sharp";
+
+    let buffer = await sharp('image.png')
+        .raw()
+        .toBuffer({ resolveWithObject: true });
+
+    let encoder = new EscPosEncoder();
+
+    let result = encoder
+        .image(buffer, 64, 64, 'atkinson')
+        .encode();
+
+
+Or in Node using `canvas`:
+
+    import { createCanvas, loadImage } from 'canvas';
+
+    let image = await loadImage('image.png');
+
+    let encoder = new EscPosEncoder({
+        createCanvas
+    });
+
+    let result = encoder
+        .image(image, 64, 64, 'atkinson')
+        .encode();
+
+
+You can find examples for many types of image reading libraries in the `examples` directory.
 
 #### Column or raster image mode
 

@@ -4,8 +4,8 @@ import { assert, expect } from 'chai';
 
 
 describe('EscPosEncoder', function() {
-    let encoder = new EscPosEncoder();
-    let rasterEncoder = new EscPosEncoder({ imageMode: 'raster' });
+    let encoder = new EscPosEncoder({ createCanvas });
+    let rasterEncoder = new EscPosEncoder({ imageMode: 'raster', createCanvas });
 
     describe('text(hello)', function () {
         let result = encoder.text('hello').encode();

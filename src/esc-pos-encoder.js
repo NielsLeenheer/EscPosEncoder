@@ -1,8 +1,9 @@
 import linewrap from 'linewrap';
-import {createCanvas} from 'canvas';
 import Dither from 'canvas-dither';
 import Flatten from 'canvas-flatten';
 import CodepageEncoder from 'codepage-encoder';
+import ImageData from '@canvas/image-data';
+import resizeImageData from 'resize-image-data';
 
 import codepageMappings from '../generated/mapping.js';
 
@@ -31,6 +32,7 @@ class EscPosEncoder {
         embedded: false,
         wordWrap: true,
         imageMode: 'column',
+        createCanvas: null,
         codepageMapping: 'epson',
         codepageCandidates: [
           'cp437', 'cp858', 'cp860', 'cp861', 'cp863', 'cp865',
@@ -979,7 +981,7 @@ class EscPosEncoder {
   /**
      * Image
      *
-     * @param  {object}         element  an element, like a canvas or image that needs to be printed
+     * @param  {object}         input  an element, like a canvas or image that needs to be printed
      * @param  {number}         width  width of the image on the printer
      * @param  {number}         height  height of the image on the printer
      * @param  {string}         algorithm  the dithering algorithm for making the image black and white
@@ -987,7 +989,7 @@ class EscPosEncoder {
      * @return {object}                  Return the object, for easy chaining commands
      *
      */
-  image(element, width, height, algorithm, threshold) {
+  image(input, width, height, algorithm, threshold) {
     if (this._embedded) {
       throw new Error('Images are not supported in table cells or boxes');
     }
@@ -1008,10 +1010,89 @@ class EscPosEncoder {
       threshold = 128;
     }
 
-    const canvas = createCanvas(width, height);
-    const context = canvas.getContext('2d');
-    context.drawImage(element, 0, 0, width, height);
-    let image = context.getImageData(0, 0, width, height);
+    /* Determine the type of the input */
+
+    const name = input.constructor.name;
+    let type;
+
+    name.endsWith('Element') ? type = 'element' : null;
+    name == 'ImageData' ? type = 'imagedata' : null;
+    name == 'Canvas' && typeof input.getContext !== 'undefined' ? type = 'node-canvas' : null;
+    name == 'Image' ? type = 'node-canvas' : null;
+    name == 'Image' && typeof input.frames !== 'undefined' ? type = 'node-read-image' : null;
+    name == 'Object' && input.data && input.info ? type = 'node-sharp' : null;
+    name == 'View3duint8' && input.data && input.shape ? type = 'ndarray' : null;
+    name == 'Object' && input.data && input.width && input.height ? type = 'object' : null;
+
+    if (!type) {
+      throw new Error('Could not determine the type of image input');
+    }
+
+    /* Turn provided data into an ImageData object */
+
+    let image;
+
+    if (type == 'element') {
+      const canvas = document.createElement('canvas');
+      canvas.width = width;
+      canvas.height = height;
+      const context = canvas.getContext('2d');
+      context.drawImage(input, 0, 0, width, height);
+      image = context.getImageData(0, 0, width, height);
+    }
+
+    if (type == 'node-canvas') {
+      if (typeof this._options.createCanvas !== 'function') {
+        throw new Error('Canvas is not supported in this environment, specify a createCanvas function in the options');
+      }
+
+      const canvas = this._options.createCanvas(width, height);
+      const context = canvas.getContext('2d');
+      context.drawImage(input, 0, 0, width, height);
+      image = context.getImageData(0, 0, width, height);
+    }
+
+    if (type == 'node-read-image') {
+      image = new ImageData(input.width, input.height);
+      image.data.set(input.frames[0].data);
+    }
+
+    if (type == 'node-sharp') {
+      image = new ImageData(input.info.width, input.info.height);
+      image.data.set(input.data);
+    }
+
+    if (type == 'ndarray') {
+      image = new ImageData(input.shape[0], input.shape[1]);
+      image.data.set(input.data);
+    }
+
+    if (type == 'object') {
+      image = new ImageData(input.width, input.height);
+      image.data.set(input.data);
+    }
+
+    if (type == 'imagedata') {
+      image = input;
+    }
+
+    if (!image) {
+      throw new Error('Image could not be loaded');
+    }
+
+    /* Resize image */
+
+    if (width !== image.width || height !== image.height) {
+      image = resizeImageData(image, width, height, 'bilinear-interpolation');
+    }
+
+    /* Check if the image has the correct dimensions */
+
+    if (width !== image.width || height !== image.height) {
+      throw new Error('Image could not be resized');
+    }
+
+    /* Flatten the image and dither it */
 
     image = Flatten.flatten(image, [0xff, 0xff, 0xff]);
 
