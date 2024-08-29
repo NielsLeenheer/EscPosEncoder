@@ -157,9 +157,9 @@ class EscPosEncoder {
      * @return {array}              Array with each line
     */
   _wrap(value, position) {
-    if (position || (this._options.wordWrap && this._options.width)) {
+    if (position || (this._options.wordWrap && this._options.width)) {      
       const indent = '-'.repeat(this._cursor);
-      const w = linewrap(position || this._options.width, {lineBreak: '\n', whitespace: 'all'});
+      const w = linewrap(position || this._options.width, {lineBreak: '\n', whitespace: 'all', mode: 'hard'});
       const result = w(indent + value).substring(this._cursor).split('\n');
 
       return result;
