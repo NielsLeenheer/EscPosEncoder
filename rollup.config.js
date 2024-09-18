@@ -38,7 +38,7 @@ export default [
     // CommonJS (for Node) and ES module (for bundlers) build
     {
 		input: 'src/esc-pos-encoder.js',
-		external: ['@canvas/image-data', 'canvas-dither', 'canvas-flatten', 'resize-image-data', 'codepage-encoder', 'linewrap'],
+		external: ['@point-of-sale/receipt-printer-encoder'],
 		output: [
 			{ file: 'dist/esc-pos-encoder.cjs', format: 'cjs' },
 			{ file: 'dist/esc-pos-encoder.mjs', format: 'es' }

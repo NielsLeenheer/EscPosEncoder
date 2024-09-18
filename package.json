@@ -15,9 +15,8 @@
   "main": "dist/esc-pos-encoder.cjs",
   "module": "dist/esc-pos-encoder.mjs",
   "scripts": {
-    "build": "npm run generate && rollup -c",
-    "generate": "node tools/generate.js",
-    "lint": "eslint --fix src/esc-pos-encoder.js",
+    "build": "rollup -c",
+    "lint": "eslint --fix src/*.js",
     "mocha": "mocha test/",
     "test": "npm run lint && npm run mocha"
   },
@@ -38,30 +37,17 @@
   },
   "homepage": "https://github.com/NielsLeenheer/EscPosEncoder#readme",
   "devDependencies": {
-    "@canvas/image": "^2.0.0",
     "@rollup/plugin-commonjs": "^24.1.0",
     "@rollup/plugin-node-resolve": "^15.0.2",
     "@rollup/plugin-terser": "^0.4.1",
-    "canvas": "^2.11.2",
     "chai": "^4.3.7",
     "eslint": "^8.39.0",
     "eslint-config-google": "^0.14.0",
-    "get-pixels": "^3.3.3",
-    "image-pixels": "^2.2.2",
-    "javascript-stringify": "^2.1.0",
     "mocha": "^10.2.0",
-    "png-js": "^1.0.0",
-    "readimage": "^1.1.1",
-    "rollup": "^3.20.7",
-    "sharp": "^0.33.5"
+    "rollup": "^3.20.7"
   },
   "dependencies": {
-    "@canvas/image-data": "^1.0.0",
-    "canvas-dither": "^1.0.1",
-    "canvas-flatten": "^1.0.1",
-    "codepage-encoder": "^3.0.0",
-    "linewrap": "^0.2.1",
-    "resize-image-data": "^0.3.1"
+    "@point-of-sale/receipt-printer-encoder": "^3.0.0"
   },
   "files": [
     "dist"
